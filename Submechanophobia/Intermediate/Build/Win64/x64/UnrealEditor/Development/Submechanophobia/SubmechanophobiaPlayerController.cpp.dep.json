@@ -1,0 +1,35 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "z:\\semester 5\\submechanophobia\\submechanophobia\\source\\submechanophobia\\submechanophobiaplayercontroller.cpp",
+        "ProvidedModule": "",
+        "PCH": "z:\\semester 5\\submechanophobia\\submechanophobia\\intermediate\\build\\win64\\x64\\submechanophobiaeditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.cpp20.h.pch",
+        "Includes": [
+            "z:\\semester 5\\submechanophobia\\submechanophobia\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\submechanophobia\\definitions.submechanophobia.h",
+            "z:\\semester 5\\submechanophobia\\submechanophobia\\source\\submechanophobia\\submechanophobiaplayercontroller.h",
+            "z:\\semester 5\\submechanophobia\\submechanophobia\\intermediate\\build\\win64\\unrealeditor\\inc\\submechanophobia\\uht\\submechanophobiaplayercontroller.generated.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\plugins\\enhancedinput\\source\\enhancedinput\\public\\enhancedinputsubsystems.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\plugins\\enhancedinput\\source\\enhancedinput\\public\\enhancedinputsubsysteminterface.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\plugins\\enhancedinput\\source\\enhancedinput\\public\\enhancedplayerinput.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\source\\runtime\\engine\\classes\\gameframework\\playerinput.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\source\\runtime\\engine\\public\\gesturerecognizer.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\source\\runtime\\engine\\public\\keystate.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\playerinput.generated.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\plugins\\enhancedinput\\source\\enhancedinput\\public\\inputaction.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\plugins\\enhancedinput\\source\\enhancedinput\\public\\inputmodifiers.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\plugins\\enhancedinput\\source\\enhancedinput\\public\\inputactionvalue.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\plugins\\enhancedinput\\intermediate\\build\\win64\\unrealeditor\\inc\\enhancedinput\\uht\\inputactionvalue.generated.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\plugins\\enhancedinput\\intermediate\\build\\win64\\unrealeditor\\inc\\enhancedinput\\uht\\inputmodifiers.generated.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\plugins\\enhancedinput\\source\\enhancedinput\\public\\inputtriggers.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\plugins\\enhancedinput\\intermediate\\build\\win64\\unrealeditor\\inc\\enhancedinput\\uht\\inputtriggers.generated.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\plugins\\enhancedinput\\intermediate\\build\\win64\\unrealeditor\\inc\\enhancedinput\\uht\\inputaction.generated.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\plugins\\enhancedinput\\intermediate\\build\\win64\\unrealeditor\\inc\\enhancedinput\\uht\\enhancedplayerinput.generated.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\plugins\\enhancedinput\\source\\enhancedinput\\public\\playermappablekeyslot.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\plugins\\enhancedinput\\intermediate\\build\\win64\\unrealeditor\\inc\\enhancedinput\\uht\\playermappablekeyslot.generated.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\plugins\\enhancedinput\\intermediate\\build\\win64\\unrealeditor\\inc\\enhancedinput\\uht\\enhancedinputsubsysteminterface.generated.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\plugins\\enhancedinput\\intermediate\\build\\win64\\unrealeditor\\inc\\enhancedinput\\uht\\enhancedinputsubsystems.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

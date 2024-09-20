@@ -1,0 +1,15 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "z:\\semester 5\\submechanophobia\\submechanophobia\\intermediate\\build\\win64\\unrealeditor\\inc\\submechanophobia\\uht\\submechanophobiaprojectile.gen.cpp",
+        "ProvidedModule": "",
+        "PCH": "z:\\semester 5\\submechanophobia\\submechanophobia\\intermediate\\build\\win64\\x64\\submechanophobiaeditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.cpp20.h.pch",
+        "Includes": [
+            "z:\\semester 5\\submechanophobia\\submechanophobia\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\submechanophobia\\definitions.submechanophobia.h",
+            "z:\\semester 5\\submechanophobia\\submechanophobia\\source\\submechanophobia\\submechanophobiaprojectile.h",
+            "z:\\semester 5\\submechanophobia\\submechanophobia\\intermediate\\build\\win64\\unrealeditor\\inc\\submechanophobia\\uht\\submechanophobiaprojectile.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

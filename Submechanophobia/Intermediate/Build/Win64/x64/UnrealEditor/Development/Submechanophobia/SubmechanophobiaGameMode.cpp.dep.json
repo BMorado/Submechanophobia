@@ -1,0 +1,29 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "z:\\semester 5\\submechanophobia\\submechanophobia\\source\\submechanophobia\\submechanophobiagamemode.cpp",
+        "ProvidedModule": "",
+        "PCH": "z:\\semester 5\\submechanophobia\\submechanophobia\\intermediate\\build\\win64\\x64\\submechanophobiaeditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.cpp20.h.pch",
+        "Includes": [
+            "z:\\semester 5\\submechanophobia\\submechanophobia\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\submechanophobia\\definitions.submechanophobia.h",
+            "z:\\semester 5\\submechanophobia\\submechanophobia\\source\\submechanophobia\\submechanophobiagamemode.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\source\\runtime\\engine\\classes\\gameframework\\gamemodebase.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\source\\runtime\\engine\\classes\\engine\\serverstatreplicator.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\serverstatreplicator.generated.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\gamemodebase.generated.h",
+            "z:\\semester 5\\submechanophobia\\submechanophobia\\intermediate\\build\\win64\\unrealeditor\\inc\\submechanophobia\\uht\\submechanophobiagamemode.generated.h",
+            "z:\\semester 5\\submechanophobia\\submechanophobia\\source\\submechanophobia\\submechanophobiacharacter.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\source\\runtime\\engine\\classes\\gameframework\\character.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\source\\runtime\\engine\\classes\\gameframework\\charactermovementreplication.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\source\\runtime\\experimental\\iris\\core\\public\\iris\\serialization\\irisobjectreferencepackagemap.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\iriscore\\uht\\irisobjectreferencepackagemap.generated.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\charactermovementreplication.generated.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\source\\runtime\\engine\\classes\\gameframework\\rootmotionsource.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\rootmotionsource.generated.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\character.generated.h",
+            "z:\\semester 5\\submechanophobia\\submechanophobia\\intermediate\\build\\win64\\unrealeditor\\inc\\submechanophobia\\uht\\submechanophobiacharacter.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

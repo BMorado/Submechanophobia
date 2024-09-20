@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "Submechanophobia",
+			"Path": "..\\Source\\Submechanophobia.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "SubmechanophobiaEditor",
+			"Path": "..\\Source\\SubmechanophobiaEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}

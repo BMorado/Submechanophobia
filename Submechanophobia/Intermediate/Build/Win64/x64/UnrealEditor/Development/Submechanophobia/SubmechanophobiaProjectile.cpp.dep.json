@@ -1,0 +1,23 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "z:\\semester 5\\submechanophobia\\submechanophobia\\source\\submechanophobia\\submechanophobiaprojectile.cpp",
+        "ProvidedModule": "",
+        "PCH": "z:\\semester 5\\submechanophobia\\submechanophobia\\intermediate\\build\\win64\\x64\\submechanophobiaeditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.cpp20.h.pch",
+        "Includes": [
+            "z:\\semester 5\\submechanophobia\\submechanophobia\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\submechanophobia\\definitions.submechanophobia.h",
+            "z:\\semester 5\\submechanophobia\\submechanophobia\\source\\submechanophobia\\submechanophobiaprojectile.h",
+            "z:\\semester 5\\submechanophobia\\submechanophobia\\intermediate\\build\\win64\\unrealeditor\\inc\\submechanophobia\\uht\\submechanophobiaprojectile.generated.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\source\\runtime\\engine\\classes\\gameframework\\projectilemovementcomponent.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\source\\runtime\\engine\\classes\\gameframework\\movementcomponent.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\movementcomponent.generated.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\projectilemovementcomponent.generated.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\source\\runtime\\engine\\classes\\components\\spherecomponent.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\source\\runtime\\engine\\classes\\components\\shapecomponent.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\shapecomponent.generated.h",
+            "z:\\unreal eng\\5.4\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\spherecomponent.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

@@ -1,0 +1,87 @@
+/MANIFEST:EMBED
+/MANIFESTINPUT:"..\Build\Windows\Resources\Default-Win64.manifest"
+/NOLOGO
+/DEBUG:FULL
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/FIXED:No
+/NXCOMPAT
+/STACK:12000000
+/DELAY:UNLOAD
+/DLL
+/PDBALTPATH:%_PDB%
+/d2:-ExtendedWarningInfo
+/OPT:NOREF
+/OPT:NOICF
+/INCREMENTAL:NO
+/ignore:4199
+/ignore:4099
+/ALTERNATENAME:__imp___std_init_once_begin_initialize=__imp_InitOnceBeginInitialize
+/ALTERNATENAME:__imp___std_init_once_complete=__imp_InitOnceComplete
+/DELAYLOAD:"d3d12.dll"
+/DELAYLOAD:"DBGHELP.DLL"
+/LIBPATH:"Z:\Visual Studio Stuff\Down Cash\VC\Tools\MSVC\14.38.33130\lib\x64"
+/LIBPATH:"C:\Program Files (x86)\Windows Kits\10\lib\10.0.19041.0\ucrt\x64"
+/LIBPATH:"C:\Program Files (x86)\Windows Kits\10\lib\10.0.19041.0\um\x64"
+/NODEFAULTLIB:"LIBCMT"
+/NODEFAULTLIB:"LIBCPMT"
+/NODEFAULTLIB:"LIBCMTD"
+/NODEFAULTLIB:"LIBCPMTD"
+/NODEFAULTLIB:"MSVCRTD"
+/NODEFAULTLIB:"MSVCPRTD"
+/NODEFAULTLIB:"LIBC"
+/NODEFAULTLIB:"LIBCP"
+/NODEFAULTLIB:"LIBCD"
+/NODEFAULTLIB:"LIBCPD"
+/FUNCTIONPADMIN:6
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\SubmechanophobiaEditor\Development\UnrealEd\SharedPCH.UnrealEd.Project.ValApi.Cpp20.h.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\Submechanophobia.init.gen.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\SubmechanophobiaCharacter.gen.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\SubmechanophobiaGameMode.gen.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\SubmechanophobiaPlayerController.gen.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\SubmechanophobiaProjectile.gen.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\TP_PickUpComponent.gen.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\TP_WeaponComponent.gen.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\Submechanophobia.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\SubmechanophobiaCharacter.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\SubmechanophobiaGameMode.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\SubmechanophobiaPlayerController.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\SubmechanophobiaProjectile.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\TP_PickUpComponent.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\TP_WeaponComponent.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\Default.rc2.res"
+"..\Intermediate\Build\Win64\x64\UnrealEditor\Development\Core\UnrealEditor-Core.lib"
+"..\Intermediate\Build\Win64\x64\UnrealEditor\Development\CoreUObject\UnrealEditor-CoreUObject.lib"
+"..\Intermediate\Build\Win64\x64\UnrealEditor\Development\Engine\UnrealEditor-Engine.lib"
+"..\Intermediate\Build\Win64\x64\UnrealEditor\Development\InputCore\UnrealEditor-InputCore.lib"
+"..\Plugins\EnhancedInput\Intermediate\Build\Win64\x64\UnrealEditor\Development\EnhancedInput\UnrealEditor-EnhancedInput.lib"
+"delayimp.lib"
+"wininet.lib"
+"rpcrt4.lib"
+"ws2_32.lib"
+"dbghelp.lib"
+"comctl32.lib"
+"Winmm.lib"
+"kernel32.lib"
+"user32.lib"
+"gdi32.lib"
+"winspool.lib"
+"comdlg32.lib"
+"advapi32.lib"
+"shell32.lib"
+"ole32.lib"
+"oleaut32.lib"
+"uuid.lib"
+"odbc32.lib"
+"odbccp32.lib"
+"netapi32.lib"
+"iphlpapi.lib"
+"setupapi.lib"
+"synchronization.lib"
+"dwmapi.lib"
+"imm32.lib"
+/OUT:"Z:\Semester 5\Submechanophobia\Submechanophobia\Binaries\Win64\UnrealEditor-Submechanophobia.dll"
+/IMPLIB:"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\UnrealEditor-Submechanophobia.sup.lib"
+/PDB:"Z:\Semester 5\Submechanophobia\Submechanophobia\Binaries\Win64\UnrealEditor-Submechanophobia.pdb"
+/ignore:4078

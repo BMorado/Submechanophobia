@@ -1,0 +1,25 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-Submechanophobia.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\SubmechanophobiaEditor\Development\UnrealEd\SharedPCH.UnrealEd.Project.ValApi.Cpp20.h.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\Submechanophobia.init.gen.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\SubmechanophobiaCharacter.gen.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\SubmechanophobiaGameMode.gen.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\SubmechanophobiaPlayerController.gen.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\SubmechanophobiaProjectile.gen.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\TP_PickUpComponent.gen.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\TP_WeaponComponent.gen.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\Submechanophobia.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\SubmechanophobiaCharacter.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\SubmechanophobiaGameMode.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\SubmechanophobiaPlayerController.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\SubmechanophobiaProjectile.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\TP_PickUpComponent.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\TP_WeaponComponent.cpp.obj"
+"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\Default.rc2.res"
+/OUT:"Z:\Semester 5\Submechanophobia\Submechanophobia\Intermediate\Build\Win64\x64\UnrealEditor\Development\Submechanophobia\UnrealEditor-Submechanophobia.lib"
