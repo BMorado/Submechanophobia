@@ -9,12 +9,12 @@
 USTRUCT(BlueprintType)
 struct FRoomPair
 {
-	GENERATED_BODY()
-	UPROPERTY(EditAnywhere, Category="Rooms")
-	TSubclassOf<AActor> PrimaryRoom;
-
-	UPROPERTY(EditAnywhere, Category="Rooms")
-	TSubclassOf<AActor> PairedRoom;
+	 GENERATED_BODY()
+	 UPROPERTY(EditAnywhere, Category="Rooms")
+	 TSubclassOf<AActor> PrimaryRoom;
+	
+	 UPROPERTY(EditAnywhere, Category="Rooms")
+	 TSubclassOf<AActor> PairedRoom;
 };
 
 
@@ -41,10 +41,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Spawning")
 	TArray<FRoomPair> RoomPairs;
 	
-	
-	TArray<TSubclassOf<AActor>> test;
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<AActor> roomsToSpawn;
+	TArray<TSubclassOf<AActor>> test;
+	//UPROPERTY(EditAnywhere)
+	//TSubclassOf<AActor> roomsToSpawn;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

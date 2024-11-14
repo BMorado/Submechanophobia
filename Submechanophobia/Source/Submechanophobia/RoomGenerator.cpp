@@ -2,7 +2,7 @@
 
 
 #include "RoomGenerator.h"
-
+#include <map>
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -19,8 +19,14 @@ void ARoomGenerator::BeginPlay()
 	UWorld* World = GetWorld();
 	Super::BeginPlay();
 	UGameplayStatics::GetAllActorsOfClass(World,roomSpawnPoints,spawnPointsList);
-	AActor* spawnedActor = spawnPointsList[FMath::RandRange(0,numOfPlayers)];
-	AActor* temp =  World->SpawnActor<AActor>(roomsToSpawn,spawnedActor->GetActorLocation(),spawnedActor->GetActorRotation());
+	
+	
+	for(AActor* spawnPoint : spawnPointsList)
+	{
+		int rand = FMath::RandRange(0,5);
+		AActor* temp = World->SpawnActor<AActor>(test[rand],spawnPoint->GetActorLocation(),spawnPoint->GetActorRotation());
+	}
+	
 }
 
 // Called every frame
