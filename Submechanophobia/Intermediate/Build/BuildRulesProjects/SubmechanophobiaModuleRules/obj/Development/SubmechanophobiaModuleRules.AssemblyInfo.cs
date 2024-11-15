@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SubmechanophobiaModuleRules")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Development")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a2d4697e109621e87e5a2112b4e7e4ca4fbc4b28")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fcda994d52634ee3824a366698f122a1f23d63ae")]
 [assembly: System.Reflection.AssemblyProductAttribute("SubmechanophobiaModuleRules")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SubmechanophobiaModuleRules")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
