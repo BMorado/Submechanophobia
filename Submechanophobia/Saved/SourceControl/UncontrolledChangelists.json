@@ -1,0 +1,14 @@
+{
+	"version": 1,
+	"changelists": [
+		{
+			"guid": "00000000000000000000000000000000",
+			"description": "Default Uncontrolled Changelist",
+			"files": [
+				"D:/Submechanophobia/Submechanophobia/Content/UI/MainMenu.umap",
+				"D:/Submechanophobia/Submechanophobia/Content/UI/Menu.uasset",
+				"D:/Submechanophobia/Submechanophobia/Content/UI/ui_assets/Sunken.uasset"
+			]
+		}
+	]
+}
