@@ -2,7 +2,7 @@
 
 
 #include "RoomGenerator.h"
-#include <map>
+#include "Algo/RandomShuffle.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -10,7 +10,6 @@ ARoomGenerator::ARoomGenerator()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
 }
 
 // Called when the game starts or when spawned
@@ -19,12 +18,19 @@ void ARoomGenerator::BeginPlay()
 	UWorld* World = GetWorld();
 	Super::BeginPlay();
 	UGameplayStatics::GetAllActorsOfClass(World,roomSpawnPoints,spawnPointsList);
+	Algo::RandomShuffle(spawnPointsList);
 	
-	
-	for(AActor* spawnPoint : spawnPointsList)
+	for (int i=0; i<3;i++)
 	{
-		int rand = FMath::RandRange(0,5);
-		AActor* temp = World->SpawnActor<AActor>(test[rand],spawnPoint->GetActorLocation(),spawnPoint->GetActorRotation());
+		spawnedPuzzles.Emplace(World->SpawnActor<APuzzle>(singleRooms[i],spawnPointsList.Pop()->GetActorLocation(),spawnPointsList.Top()->GetActorRotation()));
+		spawnedPuzzles.Emplace(World->SpawnActor<APuzzle>(roomPairs[i].PrimaryRoom,spawnPointsList.Pop()->GetActorLocation(),spawnPointsList.Top()->GetActorRotation()));
+		spawnedPuzzles.Emplace(World->SpawnActor<APuzzle>(roomPairs[i].SecondaryRoom,spawnPointsList.Pop()->GetActorLocation(),spawnPointsList.Top()->GetActorRotation()));
+	}
+
+	// After all the puzzle rooms are spawned fill all the leftover spawn points with the default type room
+	for (const AActor* list : spawnPointsList)
+	{
+		World->SpawnActor<AActor>(defaultRoom,list->GetActorLocation(),list->GetActorRotation());
 	}
 	
 }
