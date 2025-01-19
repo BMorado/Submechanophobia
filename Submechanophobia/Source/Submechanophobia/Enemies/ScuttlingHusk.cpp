@@ -23,13 +23,13 @@ AScuttlingHusk::AScuttlingHusk()
 		enemyMesh->SetRelativeScale3D(FVector(30.0));
 		enemyMesh->SetSimulatePhysics(true);
 		
-		enemyMesh->SetEnableGravity(true); 
+		//enemyMesh->SetEnableGravity(true); 
 		enemyMesh->SetCollisionProfileName("Pawn");
 		enemyMesh->BodyInstance.bLockXRotation = true;
 		enemyMesh->BodyInstance.bLockYRotation = true;
 		enemyMesh->BodyInstance.bLockZRotation = true;
 
-	
+		
 	}
 
 }

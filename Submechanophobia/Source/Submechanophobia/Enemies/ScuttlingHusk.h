@@ -20,8 +20,8 @@ class SUBMECHANOPHOBIA_API AScuttlingHusk : public AEnemy
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	USceneComponent* Root;
-	UPROPERTY(visibleAnywhere, category = Mesh )
-	USkeletalMeshComponent* enemyMesh;
+	//UPROPERTY(visibleAnywhere, category = Mesh )
+	//USkeletalMeshComponent* enemyMesh;
 	UHealthComponent* HealthComponent;
 
 	UPROPERTY(VisibleAnywhere, Category = Animation)

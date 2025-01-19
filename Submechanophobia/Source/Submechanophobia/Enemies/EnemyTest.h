@@ -3,31 +3,27 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Pawn.h"
-#include "string"
-#include "Enemy.generated.h"
+#include "GameFramework/Character.h"
+#include "EnemyTest.generated.h"
 
 UCLASS()
-class SUBMECHANOPHOBIA_API AEnemy : public APawn
+class SUBMECHANOPHOBIA_API AEnemyTest : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this pawn's properties
-	AEnemy();
+	// Sets default values for this character's properties
+	AEnemyTest();
 
 protected:
 	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
-	
-
-public:
-	virtual void BeginPlay();
+public:	
 	// Called every frame
-	virtual void Tick(float DeltaTime) ;
+	virtual void Tick(float DeltaTime) override;
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	UPROPERTY(visibleAnywhere,BlueprintReadWrite, Category = "Components" )
-	USkeletalMeshComponent* enemyMesh;
-	
+
 };

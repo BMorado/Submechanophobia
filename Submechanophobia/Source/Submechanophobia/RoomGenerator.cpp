@@ -23,8 +23,8 @@ void ARoomGenerator::BeginPlay()
 	for (int i=0; i<3;i++)
 	{
 		spawnedPuzzles.Emplace(World->SpawnActor<APuzzle>(singleRooms[i],spawnPointsList.Pop()->GetActorLocation(),spawnPointsList.Top()->GetActorRotation()));
-		spawnedPuzzles.Emplace(World->SpawnActor<APuzzle>(roomPairs[i].PrimaryRoom,spawnPointsList.Pop()->GetActorLocation(),spawnPointsList.Top()->GetActorRotation()));
-		spawnedPuzzles.Emplace(World->SpawnActor<APuzzle>(roomPairs[i].SecondaryRoom,spawnPointsList.Pop()->GetActorLocation(),spawnPointsList.Top()->GetActorRotation()));
+		//spawnedPuzzles.Emplace(World->SpawnActor<APuzzle>(roomPairs[i].PrimaryRoom,spawnPointsList.Pop()->GetActorLocation(),spawnPointsList.Top()->GetActorRotation()));
+		//spawnedPuzzles.Emplace(World->SpawnActor<APuzzle>(roomPairs[i].SecondaryRoom,spawnPointsList.Pop()->GetActorLocation(),spawnPointsList.Top()->GetActorRotation()));
 	}
 
 	// After all the puzzle rooms are spawned fill all the leftover spawn points with the default type room
