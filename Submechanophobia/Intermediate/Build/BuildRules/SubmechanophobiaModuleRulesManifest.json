@@ -1,8 +1,10 @@
 {
 	"SourceFiles": [
-		"Z:\\Semester 5\\Submechanophobia\\Submechanophobia\\Source\\Submechanophobia\\Submechanophobia.Build.cs",
-		"Z:\\Semester 5\\Submechanophobia\\Submechanophobia\\Source\\Submechanophobia.Target.cs",
-		"Z:\\Semester 5\\Submechanophobia\\Submechanophobia\\Source\\SubmechanophobiaEditor.Target.cs"
+		"C:\\Users\\liamn\\Documents\\GitHub\\Submechanophobia\\Submechanophobia\\Source\\Submechanophobia\\Submechanophobia.Build.cs",
+		"C:\\Users\\liamn\\Documents\\GitHub\\Submechanophobia\\Submechanophobia\\Plugins\\AdvancedSessions\\Source\\AdvancedSessions\\AdvancedSessions.Build.cs",
+		"C:\\Users\\liamn\\Documents\\GitHub\\Submechanophobia\\Submechanophobia\\Plugins\\AdvancedSteamSessions\\Source\\AdvancedSteamSessions\\AdvancedSteamSessions.Build.cs",
+		"C:\\Users\\liamn\\Documents\\GitHub\\Submechanophobia\\Submechanophobia\\Source\\Submechanophobia.Target.cs",
+		"C:\\Users\\liamn\\Documents\\GitHub\\Submechanophobia\\Submechanophobia\\Source\\SubmechanophobiaEditor.Target.cs"
 	],
 	"EngineVersion": "5.4.4"
 }

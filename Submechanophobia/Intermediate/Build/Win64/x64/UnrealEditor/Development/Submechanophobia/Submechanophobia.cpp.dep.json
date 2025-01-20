@@ -1,12 +1,12 @@
 {
     "Version": "1.2",
     "Data": {
-        "Source": "z:\\semester 5\\submechanophobia\\submechanophobia\\source\\submechanophobia\\submechanophobia.cpp",
+        "Source": "c:\\users\\liamn\\documents\\github\\submechanophobia\\submechanophobia\\source\\submechanophobia\\submechanophobia.cpp",
         "ProvidedModule": "",
-        "PCH": "z:\\semester 5\\submechanophobia\\submechanophobia\\intermediate\\build\\win64\\x64\\submechanophobiaeditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.cpp20.h.pch",
+        "PCH": "c:\\users\\liamn\\documents\\github\\submechanophobia\\submechanophobia\\intermediate\\build\\win64\\x64\\submechanophobiaeditor\\development\\unrealed\\sharedpch.unrealed.project.valapi.cpp20.h.pch",
         "Includes": [
-            "z:\\semester 5\\submechanophobia\\submechanophobia\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\submechanophobia\\definitions.submechanophobia.h",
-            "z:\\semester 5\\submechanophobia\\submechanophobia\\source\\submechanophobia\\submechanophobia.h"
+            "c:\\users\\liamn\\documents\\github\\submechanophobia\\submechanophobia\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\submechanophobia\\definitions.submechanophobia.h",
+            "c:\\users\\liamn\\documents\\github\\submechanophobia\\submechanophobia\\source\\submechanophobia\\submechanophobia.h"
         ],
         "ImportedModules": [],
         "ImportedHeaderUnits": []
