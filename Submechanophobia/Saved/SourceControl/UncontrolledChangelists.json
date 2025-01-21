@@ -1,0 +1,18 @@
+{
+	"version": 1,
+	"changelists": [
+		{
+			"guid": "00000000000000000000000000000000",
+			"description": "Default Uncontrolled Changelist",
+			"files": [
+				"C:/Users/liamn/Documents/GitHub/Submechanophobia/Submechanophobia/Content/UI/CreateSession.uasset",
+				"C:/Users/liamn/Documents/GitHub/Submechanophobia/Submechanophobia/Content/FirstPerson/Blueprints/GI_Submechaphobia.uasset",
+				"C:/Users/liamn/Documents/GitHub/Submechanophobia/Submechanophobia/Content/UI/Menu.uasset",
+				"C:/Users/liamn/Documents/GitHub/Submechanophobia/Submechanophobia/Content/UI/ServerCard.uasset",
+				"C:/Users/liamn/Documents/GitHub/Submechanophobia/Submechanophobia/Content/UI/ServerBrowser.uasset",
+				"C:/Users/liamn/Documents/GitHub/Submechanophobia/Submechanophobia/Content/UI/Host_Or_Join_Temp.uasset",
+				"C:/Users/liamn/Documents/GitHub/Submechanophobia/Submechanophobia/Content/UI/MainMenu.umap"
+			]
+		}
+	]
+}
