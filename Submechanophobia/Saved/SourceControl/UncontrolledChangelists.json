@@ -11,7 +11,10 @@
 				"C:/Users/liamn/Documents/GitHub/Submechanophobia/Submechanophobia/Content/UI/ServerCard.uasset",
 				"C:/Users/liamn/Documents/GitHub/Submechanophobia/Submechanophobia/Content/UI/ServerBrowser.uasset",
 				"C:/Users/liamn/Documents/GitHub/Submechanophobia/Submechanophobia/Content/UI/Host_Or_Join_Temp.uasset",
-				"C:/Users/liamn/Documents/GitHub/Submechanophobia/Submechanophobia/Content/UI/MainMenu.umap"
+				"C:/Users/liamn/Documents/GitHub/Submechanophobia/Submechanophobia/Content/UI/MainMenu.umap",
+				"C:/Users/liamn/Documents/GitHub/Submechanophobia/Submechanophobia/Content/UI/MenuGamemode/MainMenuGamemode.uasset",
+				"C:/Users/liamn/Documents/GitHub/Submechanophobia/Submechanophobia/Content/UI/MenuGamemode/MainMenuPlayerController.uasset",
+				"C:/Users/liamn/Documents/GitHub/Submechanophobia/Submechanophobia/Content/UI/MenuGamemode/MainMenu_BPInterface.uasset"
 			]
 		}
 	]
