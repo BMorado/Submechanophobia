@@ -1,0 +1,38 @@
+# Normalize line endings for text files
+* text=auto
+*.h text
+*.cpp text
+*.cs text
+*.ini text
+*.config text
+*.uproject text
+*.sln text
+# Unreal Engine assets (binary files managed with LFS)
+*.uasset filter=lfs diff=lfs merge=lfs -text
+*.umap filter=lfs diff=lfs merge=lfs -text
+*.uobject filter=lfs diff=lfs merge=lfs -text
+*.locres filter=lfs diff=lfs merge=lfs -text
+*.locmeta filter=lfs diff=lfs merge=lfs -text
+# Steam Audio assets
+*.phononscene filter=lfs diff=lfs merge=lfs -text
+*.probebox filter=lfs diff=lfs merge=lfs -text
+*.probebatch filter=lfs diff=lfs merge=lfs -text
+*.bakedsources filter=lfs diff=lfs merge=lfs -text
+# FMOD and audio files
+*.bank filter=lfs diff=lfs merge=lfs -text
+*.wav filter=lfs diff=lfs merge=lfs -text
+*.mp3 filter=lfs diff=lfs merge=lfs -text
+*.ogg filter=lfs diff=lfs merge=lfs -text
+*.flac filter=lfs diff=lfs merge=lfs -text
+# Icons
+*.png filter=lfs diff=lfs merge=lfs -text
+*.ico filter=lfs diff=lfs merge=lfs -text
+*.icns filter=lfs diff=lfs merge=lfs -text
+# Movies
+*.bk2 filter=lfs diff=lfs merge=lfs -text
+*.mp4 filter=lfs diff=lfs merge=lfs -text
+# Other Unreal-related binaries
+*.sav filter=lfs diff=lfs merge=lfs -text
+*.pak lfs
+*.csv filter=lfs diff=lfs merge=lfs -text
+*.fbx filter=lfs diff=lfs merge=lfs -text
