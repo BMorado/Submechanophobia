@@ -3,6 +3,7 @@
 
 #include "Enemy.h"
 
+#include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -10,20 +11,24 @@ AEnemy::AEnemy()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	/*enemyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("EnemyMesh"));
-	RootComponent = enemyMesh;
-	
-	// Optionally assign a default skeletal mesh
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> DefaultMesh(TEXT("/Game/Boss_assets/Scuttling_Husk/scuttling_husk_exp_nov13.scuttling_husk_exp_nov13"));
-	if (DefaultMesh.Succeeded())
-	{
-		enemyMesh->SetSkeletalMesh(DefaultMesh.Object);
-		enemyMesh->SetupAttachment(RootComponent);
-		enemyMesh->SetRelativeRotation(FRotator(0, 180.0f, 0));
-		enemyMesh->SetRelativeLocation(FVector::ZeroVector);
-		enemyMesh->SetRelativeScale3D(FVector(30.0f));
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	RootComponent = Root;
 
-	}*/
+	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
+	CapsuleComponent->SetupAttachment(Root);
+	CapsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
+
+	CapsuleComponent->SetHiddenInGame(false);
+	CapsuleComponent->SetVisibility(true);
+	
+	CapsuleComponent->bHiddenInGame = false;
+	CapsuleComponent->bVisualizeComponent = true;
+	
+	CapsuleComponent->ShapeColor = FColor::Green;
+	
+	
+
+	
 }
 
 // Called when the game starts or when spawned

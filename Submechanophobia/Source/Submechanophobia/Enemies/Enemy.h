@@ -26,10 +26,19 @@ public:
 	virtual void Tick(float DeltaTime) ;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION()
 	virtual void Attack() ;
 	
 	UPROPERTY(visibleAnywhere,BlueprintReadWrite, Category = "Components" )
+	USceneComponent* Root;
+
+	UPROPERTY(visibleAnywhere,BlueprintReadWrite, Category = "Components" )
+	UCapsuleComponent* CapsuleComponent;
+	
+	UPROPERTY(visibleAnywhere,BlueprintReadWrite, Category = "Components" )
 	USkeletalMeshComponent* enemyMesh;
+
+	UPROPERTY()
 	UFloatingPawnMovement* MovementComponent;
 };
 
