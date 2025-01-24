@@ -12,6 +12,18 @@
 *.VC.opendb
 *.uprojectdirs
 
+# Ignore Unreal Engine config files
+Config/*.ini
+!Config/DefaultEngine.ini
+!Config/DefaultGame.ini
+
+# Ignore compiled DLL files
+*.dll
+
+# Ignore log files
+*.log
+
+
 # Build Artifacts
 /Build/
 *.vcxproj*
