@@ -10,7 +10,7 @@ AEnemy::AEnemy()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	enemyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("EnemyMesh"));
+	/*enemyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("EnemyMesh"));
 	RootComponent = enemyMesh;
 	
 	// Optionally assign a default skeletal mesh
@@ -23,7 +23,7 @@ AEnemy::AEnemy()
 		enemyMesh->SetRelativeLocation(FVector::ZeroVector);
 		enemyMesh->SetRelativeScale3D(FVector(30.0f));
 
-	}
+	}*/
 }
 
 // Called when the game starts or when spawned
@@ -39,6 +39,11 @@ void AEnemy::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+void AEnemy::Attack()
+{
+	
+}
+
 
 
 

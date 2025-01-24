@@ -15,15 +15,22 @@
 UCLASS()
 class SUBMECHANOPHOBIA_API AScuttlingHusk : public AEnemy
 {
+private:
 	GENERATED_BODY()
 	AScuttlingHusk();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-	USceneComponent* Root;
-	//UPROPERTY(visibleAnywhere, category = Mesh )
-	//USkeletalMeshComponent* enemyMesh;
-	UHealthComponent* HealthComponent;
+	
+	virtual void Attack() override;
 
+	
+	USceneComponent* Root = nullptr;
+	uint8 damage = 10;
+	FTimerHandle Timer;
+	UHealthComponent* HealthComponent;
+	
 	UPROPERTY(VisibleAnywhere, Category = Animation)
 	UAnimBlueprint* animBlueprint;
+
+	
 };

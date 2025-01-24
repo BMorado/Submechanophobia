@@ -3,3 +3,6 @@
 
 #include "EnemyAIController.h"
 
+void AEnemyAIController::OnPerceptionUpdated(TArray<AActor*> UpdatedActors)
+{
+}

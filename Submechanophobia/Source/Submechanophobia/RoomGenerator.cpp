@@ -39,6 +39,5 @@ void ARoomGenerator::BeginPlay()
 void ARoomGenerator::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
