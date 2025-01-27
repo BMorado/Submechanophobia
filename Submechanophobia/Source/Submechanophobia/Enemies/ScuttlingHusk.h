@@ -28,7 +28,7 @@ private:
 	
 	uint8 damage = 10;
 	FTimerHandle Timer;
-	UHealthComponent* HealthComponent;
+	
 	
 	
 

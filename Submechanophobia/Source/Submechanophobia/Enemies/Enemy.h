@@ -3,9 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "HealthComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/Pawn.h"
-
 #include "Enemy.generated.h"
 
 UCLASS()
@@ -38,8 +39,14 @@ public:
 	UPROPERTY(visibleAnywhere,BlueprintReadWrite, Category = "Components" )
 	USkeletalMeshComponent* enemyMesh;
 
+	// allows AIController to move the pawn
 	UPROPERTY()
 	UFloatingPawnMovement* MovementComponent;
+	
+	UPROPERTY()
+	UHealthComponent* HealthComponent;
+
+	
 };
 
 

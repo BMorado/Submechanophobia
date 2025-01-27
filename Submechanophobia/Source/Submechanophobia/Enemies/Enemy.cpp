@@ -9,26 +9,42 @@
 // Sets default values
 AEnemy::AEnemy()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	RootComponent = Root;
+	
+	// Setup Root component 
+	
+	
+	enemyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Enemy Mesh"));
+	enemyMesh->SetCanEverAffectNavigation(false);
 
+	
+	
+	// Setup for Capsule collider 
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
 	CapsuleComponent->SetupAttachment(Root);
 	CapsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
+	CapsuleComponent->SetCanEverAffectNavigation(false);
+	CapsuleComponent->SetSimulatePhysics(true);
 
+	RootComponent = CapsuleComponent;
+	
+	CapsuleComponent->BodyInstance.bLockXRotation = true;
+	CapsuleComponent->BodyInstance.bLockYRotation = true;
+	//CapsuleComponent->BodyInstance.bLockZRotation = true;
+	
+	// Displays the collider in The editor and game
 	CapsuleComponent->SetHiddenInGame(false);
 	CapsuleComponent->SetVisibility(true);
-	
-	CapsuleComponent->bHiddenInGame = false;
-	CapsuleComponent->bVisualizeComponent = true;
-	
 	CapsuleComponent->ShapeColor = FColor::Green;
-	
-	
 
-	
+	// Setup Health Component
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	HealthComponent->Initialize(100);
+
+	// Setup movement component 
+	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
+	MovementComponent->UpdatedComponent = RootComponent;
 }
 
 // Called when the game starts or when spawned

@@ -3,22 +3,13 @@
 
 #include "ScuttlingHusk.h"
 #include "DrawDebugHelpers.h"
-#include "Components/CapsuleComponent.h"
+
 
 
 
 AScuttlingHusk::AScuttlingHusk()
 {
-	
 
-	enemyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Enemy Mesh"));
-	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
-	HealthComponent->Initialize(100);
-
-	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
-	MovementComponent->UpdatedComponent = RootComponent;
-
-	
 	CapsuleComponent->SetRelativeScale3D(FVector(3.066639f, 3.066639, 2.818257));
 	CapsuleComponent->SetRelativeRotation(FRotator(90.0f, 90.0f, 180.0f));
 	CapsuleComponent->SetRelativeLocation(FVector(14.1915f, 0.0f, 58.972f));
