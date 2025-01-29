@@ -3,11 +3,22 @@
 
 #include "EnemyPrototype.h"
 
+#include <iostream>
+#include <ostream>
+
+#include "EnemyAIController.h"
+#include <string>
+#include "AIController.h"
+
+
 
 AEnemyPrototype::AEnemyPrototype()
 {
-
+	
 	bUseControllerRotationYaw = true;
+
+	
+		AIControllerClass = AEnemyAIController::StaticClass();
 	
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> enemyAsset(TEXT("/Game/TEST/Enemy/Test_Enemy_Stuff/The_Boss.The_Boss"));
 	CapsuleComponent->SetRelativeScale3D(FVector(1.784029,1.784029,2.394067));
@@ -48,10 +59,26 @@ AEnemyPrototype::AEnemyPrototype()
 void AEnemyPrototype::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	SetDamage(15);
 }
 
 void AEnemyPrototype::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	Attack();
+}
+
+void AEnemyPrototype::Attack(){
+	Super::Attack();
+	FVector start = enemyMesh->GetBoneLocation("LeftHandMiddle1");
+	FVector end = enemyMesh->GetBoneLocation("LeftHandMiddle1");
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(GetOwner());
+	FHitResult hits;
+	UKismetSystemLibrary::SphereTraceSingle(GetWorld(),start,end,30.0f,UEngineTypes::ConvertToTraceType(ECC_Camera)
+		,false,ActorsToIgnore,EDrawDebugTrace::ForDuration,hits,true);
+	
+	
+	
+	UGameplayStatics::ApplyDamage(hits.GetActor(),GetDamage(),nullptr,this,nullptr);
 }

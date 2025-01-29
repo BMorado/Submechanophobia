@@ -24,6 +24,7 @@ AEnemy::AEnemy()
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
 	CapsuleComponent->SetupAttachment(Root);
 	CapsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
+	CapsuleComponent->SetCollisionResponseToChannel(ECC_Camera,ECR_Ignore);
 	CapsuleComponent->SetCanEverAffectNavigation(false);
 	CapsuleComponent->SetSimulatePhysics(true);
 
