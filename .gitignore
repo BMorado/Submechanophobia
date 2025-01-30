@@ -1,3 +1,14 @@
-Submechanophobia/Saved/Logs/Submechanophobia.log
-Submechanophobia/Saved/Telemetry/Telemetry.json
 Submechanophobia/Saved/AutoScreenshot.png
+Submechanophobia/Intermediate/ProjectFiles/UECommon.props
+*.props
+*.filters
+*.ini
+*.log
+*.json
+*.target
+*.pdb
+*.bin
+*.uhtpath
+*.pdb
+/Submechanophobia/Saved/Logs
+/Submechanophobia/Saved

@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "HealthComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Pawn.h"
 #include "Enemy.generated.h"
@@ -21,12 +23,11 @@ public:
 protected:
 	// Called when the game starts or when spawned
 private:
-	
+	uint8 damage;
 public:
 	virtual void BeginPlay();
 	virtual void Tick(float DeltaTime) ;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	UFUNCTION()
 	virtual void Attack() ;
 	
@@ -46,7 +47,8 @@ public:
 	UPROPERTY()
 	UHealthComponent* HealthComponent;
 
-	
+	uint8 GetDamage() const{return damage;}
+	void SetDamage(const uint8 damage_){damage = damage_;}
 };
 
 

@@ -15,13 +15,16 @@ class SUBMECHANOPHOBIA_API AEnemyAIController : public AAIController
 {
 	GENERATED_BODY()
 private:
+	AEnemyAIController();
 	// AI Perception Component
-	//UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="AI",meta=(AllowPrivateAccess=true))
-	//UAIPerceptionComponent* PerceptionComponent;
+	/*UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="AI",meta=(AllowPrivateAccess=true))
+	UAIPerceptionComponent* PerceptionComponent;*/
 
+	
 	UPROPERTY()
 	class UAISenseConfig_Sight* SightConfig;
-
 	UFUNCTION()
 	void OnPerceptionUpdated(TArray<AActor*> UpdatedActors);
+
+	
 };
