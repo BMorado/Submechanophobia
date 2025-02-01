@@ -15,9 +15,7 @@ AEnemy::AEnemy()
 	// Setup Root component 
 	
 	
-	enemyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Enemy Mesh"));
-	enemyMesh->SetCanEverAffectNavigation(false);
-
+	
 	
 	
 	// Setup for Capsule collider 
@@ -43,6 +41,10 @@ AEnemy::AEnemy()
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 	HealthComponent->Initialize(100);
 
+	enemyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Enemy Mesh"));
+	enemyMesh->SetCanEverAffectNavigation(false);
+	enemyMesh->SetupAttachment(CapsuleComponent);
+	
 	// Setup movement component 
 	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
 	MovementComponent->UpdatedComponent = RootComponent;

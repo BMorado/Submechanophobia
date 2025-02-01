@@ -6,7 +6,7 @@
 
 
 
-
+// TODO: scale the capsule to the correct size, fobjetc find the mesh and check if mesh is valid, set enemy mesh to found mesh 
 AScuttlingHusk::AScuttlingHusk()
 {
 

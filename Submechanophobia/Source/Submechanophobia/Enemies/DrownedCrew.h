@@ -4,19 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "Enemy.h"
-#include "HealthComponent.h"
-#include "EnemyAIController.h"
-#include "ScuttlingHusk.generated.h"
+#include "DrownedCrew.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SUBMECHANOPHOBIA_API AScuttlingHusk : public AEnemy
+class SUBMECHANOPHOBIA_API ADrownedCrew : public AEnemy
 {
-private:
 	GENERATED_BODY()
-	AScuttlingHusk();
+	ADrownedCrew();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	
@@ -24,9 +21,4 @@ private:
 	
 	uint8 damage = 10;
 	FTimerHandle Timer;
-	
-	
-	
-
-	
 };
