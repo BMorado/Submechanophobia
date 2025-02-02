@@ -37,7 +37,7 @@ Binaries/
 */Binaries/*
 Intermediate/
 */Intermediate/*
-
+/Submechanophobia/Plugins/AdvancedSessions/Intermediate
 # Unreal Engine config files
 Config/*.ini
 # Optional: Keep essential config files for team sharing
