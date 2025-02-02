@@ -12,3 +12,9 @@ Submechanophobia/Intermediate/ProjectFiles/UECommon.props
 *.pdb
 /Submechanophobia/Saved/Logs
 /Submechanophobia/Saved
+Submechanophobia/.vs/ProjectEvaluation/submechanophobia.metadata.v9.bin
+*.bin
+*.json
+*.log
+*.ini
+*.ini
