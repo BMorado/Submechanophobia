@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "HealthComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/CapsuleComponent.h"
@@ -49,6 +50,8 @@ public:
 
 	uint8 GetDamage() const{return damage;}
 	void SetDamage(const uint8 damage_){damage = damage_;}
+
+	FTimerHandle timer;
 };
 
 

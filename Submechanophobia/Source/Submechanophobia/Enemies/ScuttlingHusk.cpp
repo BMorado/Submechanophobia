@@ -43,20 +43,20 @@ void AScuttlingHusk::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	//GetWorld()->GetTimerManager().SetTimer(Timer,this,AScuttlingHusk::Attack(),5.0f,true);
-	//DrawDebugCapsule(GetWorld(), collider->GetComponentLocation(), collider->GetUnscaledCapsuleHalfHeight(), collider->GetUnscaledCapsuleHalfHeight(),collider->GetRelativeRotation().Quaternion(), FColor::Green, true, -1.0f, 0, 2.0f);
+	GetWorld()->GetTimerManager().SetTimer(timer,this,&AScuttlingHusk::Attack,0.25f,true);
+	
 }
 
 void AScuttlingHusk::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	Attack();
+	
 }
 
 void AScuttlingHusk::Attack() 
 {
 	
-	/*Super::Attack();
+	Super::Attack();
 	FVector start = enemyMesh->GetBoneLocation("claw2_L");
 	FVector end = enemyMesh->GetBoneLocation("claw2_L");
 	TArray<AActor*> ActorsToIgnore;
@@ -66,7 +66,6 @@ void AScuttlingHusk::Attack()
 		,false,ActorsToIgnore,EDrawDebugTrace::ForDuration,hits,true);
 	
 		UGameplayStatics::ApplyDamage(hits.GetActor(),damage,nullptr,this,nullptr);
-		*/
 
 	
 }

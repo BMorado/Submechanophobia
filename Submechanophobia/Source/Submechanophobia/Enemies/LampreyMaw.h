@@ -4,20 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "Enemy.h"
-#include "DrownedCrew.generated.h"
+#include "LampreyMaw.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SUBMECHANOPHOBIA_API ADrownedCrew : public AEnemy
+class SUBMECHANOPHOBIA_API ALampreyMaw : public AEnemy
 {
 	GENERATED_BODY()
-	ADrownedCrew();
+
+	ALampreyMaw();
+	
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-	
+
 	virtual void Attack() override;
-	
+
 	uint8 damage = 10;
+	
 };
