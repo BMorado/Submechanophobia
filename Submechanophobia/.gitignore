@@ -7,9 +7,10 @@
 */DerivedDataCache/*
 /Content/Python
 /Logs/
-
+/Submechanophobia/.vs
 Submechanophobia/Saved/AutoScreenshot.png
 Submechanophobia/Intermediate/ProjectFiles/UECommon.props
+/Submechanophobia/Plugins/AdvancedSessions/Intermediate
 *.props
 *.filters
 *.ini
