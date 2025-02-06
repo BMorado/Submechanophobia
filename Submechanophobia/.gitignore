@@ -23,7 +23,7 @@ Submechanophobia/Intermediate/ProjectFiles/UECommon.props
 *.pdb
 /Submechanophobia/Saved/Logs
 /Submechanophobia/Saved
-/Submechanophobia/Plugins/AdvancedSessions
+
 
 # Unreal Engine project files
 *.xcodeproj
