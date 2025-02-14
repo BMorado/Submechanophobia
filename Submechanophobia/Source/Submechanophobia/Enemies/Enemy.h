@@ -33,20 +33,20 @@ public:
 	virtual void Attack() ;
 	
 	UPROPERTY(visibleAnywhere,BlueprintReadWrite, Category = "Components" )
-	USceneComponent* Root;
+	TObjectPtr<USceneComponent> Root;
 
 	UPROPERTY(visibleAnywhere,BlueprintReadWrite, Category = "Components" )
-	UCapsuleComponent* CapsuleComponent;
+	TObjectPtr<UCapsuleComponent> CapsuleComponent;
 	
 	UPROPERTY(visibleAnywhere,BlueprintReadWrite, Category = "Components" )
-	USkeletalMeshComponent* enemyMesh;
+	TObjectPtr<USkeletalMeshComponent>  enemyMesh;
 
 	// allows AIController to move the pawn
 	UPROPERTY()
-	UFloatingPawnMovement* MovementComponent;
+	TObjectPtr<UFloatingPawnMovement>  MovementComponent;
 	
 	UPROPERTY()
-	UHealthComponent* HealthComponent;
+	TObjectPtr<UHealthComponent>  HealthComponent;
 
 	uint8 GetDamage() const{return damage;}
 	void SetDamage(const uint8 damage_){damage = damage_;}
