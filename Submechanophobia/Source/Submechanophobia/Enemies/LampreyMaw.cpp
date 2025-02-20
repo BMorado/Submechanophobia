@@ -32,8 +32,8 @@ ALampreyMaw::ALampreyMaw()
 		enemyMesh->BodyInstance.bLockZRotation = true;*/
 	}
 	//SetUp animations 
-	static ConstructorHelpers::FObjectFinder<UAnimBlueprint> AnimBlueprint(TEXT("/Game/AI/LampreyMawAI/Anim/LampreyMaw_ABP.LampreyMaw_ABP"));
-	enemyMesh->AnimClass = AnimBlueprint.Object->GeneratedClass;
+	//static ConstructorHelpers::FObjectFinder<UAnimBlueprint> AnimBlueprint(TEXT("/Game/AI/LampreyMawAI/Anim/LampreyMaw_ABP.LampreyMaw_ABP"));
+	//enemyMesh->AnimClass = AnimBlueprint.Object->GeneratedClass;
 }
 
 void ALampreyMaw::BeginPlay()
