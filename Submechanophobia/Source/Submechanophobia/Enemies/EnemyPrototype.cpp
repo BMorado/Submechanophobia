@@ -38,16 +38,9 @@ AEnemyPrototype::AEnemyPrototype()
 
 		enemyMesh->AnimClass = AnimBlueprint.Object->GetClass();
 		
-		
-		
-		/*// Enable Physics 
-		enemyMesh->SetSimulatePhysics(true);
-		enemyMesh->SetCollisionProfileName("Pawn");
-
-		// Stops you from being able to flip the Enemy 
-		enemyMesh->BodyInstance.bLockXRotation = true;
-		enemyMesh->BodyInstance.bLockYRotation = true;
-		enemyMesh->BodyInstance.bLockZRotation = true;*/
+		bUseControllerRotationYaw = true;
+		bUseControllerRotationPitch = true;
+		bUseControllerRotationRoll = true;
 	}
 	
 }

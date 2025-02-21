@@ -20,21 +20,21 @@ AEnemy::AEnemy()
 	
 	// Setup for Capsule collider 
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
-	CapsuleComponent->SetupAttachment(Root);
+
 	CapsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
 	CapsuleComponent->SetCollisionResponseToChannel(ECC_Camera,ECR_Ignore);
 	CapsuleComponent->SetCanEverAffectNavigation(false);
-	CapsuleComponent->SetSimulatePhysics(true);
+	CapsuleComponent->SetSimulatePhysics(false);
 
 	RootComponent = CapsuleComponent;
 	
-	CapsuleComponent->BodyInstance.bLockXRotation = true;
+	//CapsuleComponent->BodyInstance.bLockXRotation = true;
 	CapsuleComponent->BodyInstance.bLockYRotation = true;
-	//CapsuleComponent->BodyInstance.bLockZRotation = true;
+	CapsuleComponent->BodyInstance.bLockZRotation = true;
 	
 	// Displays the collider in The editor and game
 	CapsuleComponent->SetHiddenInGame(false);
-	CapsuleComponent->SetVisibility(true);
+	CapsuleComponent->SetVisibility(false);
 	CapsuleComponent->ShapeColor = FColor::Green;
 
 	// Setup Health Component
@@ -43,11 +43,11 @@ AEnemy::AEnemy()
 
 	enemyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Enemy Mesh"));
 	enemyMesh->SetCanEverAffectNavigation(false);
-	enemyMesh->SetupAttachment(CapsuleComponent);
+
 	
 	// Setup movement component 
 	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
-	MovementComponent->UpdatedComponent = RootComponent;
+	MovementComponent->UpdatedComponent = CapsuleComponent;
 }
 
 // Called when the game starts or when spawned
