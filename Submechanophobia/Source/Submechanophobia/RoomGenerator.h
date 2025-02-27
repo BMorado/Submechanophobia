@@ -39,7 +39,7 @@ protected:
 	// List of the room spawn points
 	UPROPERTY()
 	TArray<AActor*> spawnPointsList;
-
+	
 	// Puzzle Rooms that take up two spaces 
 	UPROPERTY(EditAnywhere, Category="Spawning")
 	TArray<FRoomPair> roomPairs;
