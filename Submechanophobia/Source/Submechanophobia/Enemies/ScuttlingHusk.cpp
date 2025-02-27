@@ -17,7 +17,7 @@ AScuttlingHusk::AScuttlingHusk()
 	
 	// Set up skel mesh
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> enemyAsset(TEXT("/Game/Boss_assets/Scuttling_Husk/scuttling_husk_exp_feb2.scuttling_husk_exp_feb2"));
-	static ConstructorHelpers::FClassFinder<AEnemyAIController> AIClass(TEXT("/Game/TEST/Enemy/Test_Enemy_Stuff/MyEnemyAIControllerBP.MyEnemyAIControllerBP"));
+	//static ConstructorHelpers::FClassFinder<AEnemyAIController> AIClass(TEXT("/Game/TEST/Enemy/Test_Enemy_Stuff/MyEnemyAIControllerBP.MyEnemyAIControllerBP"));
 	static ConstructorHelpers::FObjectFinder<UAnimBlueprint> AnimBlueprint(TEXT("/Game/AI/ScuttlingHuskAI/Anims/Crab_ABP.Crab_ABP"));
 	if (enemyAsset.Succeeded())
 	{
@@ -44,11 +44,11 @@ AScuttlingHusk::AScuttlingHusk()
 		UE_LOG(LogTemp, Error, TEXT("enemyMesh or enemyMeshAsset is null! Check if it was created properly."));
 	}
 	
-		AIControllerClass = AIClass.Class;
+		//AIControllerClass = AIClass.Class;
 	
 	//AIControllerClass = AEnemyAIController::StaticClass();
 	
-	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	//AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 
