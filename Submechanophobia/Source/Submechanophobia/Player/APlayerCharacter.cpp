@@ -15,6 +15,10 @@ AAPlayerCharacter::AAPlayerCharacter()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Player Camera"));
 	Camera->SetupAttachment(RootComponent);
+	Camera->bUsePawnControlRotation = true;
+	bUseControllerRotationPitch = true;
+	bUseControllerRotationYaw = true;
+	bUseControllerRotationRoll = false;
 }
 
 // Called when the game starts or when spawned
