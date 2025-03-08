@@ -11,6 +11,9 @@
 /**
  * 
  */
+
+
+
 UCLASS()
 class SUBMECHANOPHOBIA_API AScuttlingHusk : public AEnemy
 {
@@ -19,14 +22,20 @@ private:
 	AScuttlingHusk();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+
 	
 	virtual void Attack() override;
+
+	
+
+	
+	UPROPERTY(VisibleAnywhere,Category = "Animation")
+	TObjectPtr<UAnimMontage> attackMontage;
 	
 	uint8 damage = 10;
 	FTimerHandle Timer;
 	
-	
-	
+
 
 	
 };

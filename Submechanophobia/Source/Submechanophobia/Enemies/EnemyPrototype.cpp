@@ -24,7 +24,7 @@ AEnemyPrototype::AEnemyPrototype()
 	CapsuleComponent->SetRelativeScale3D(FVector(1.784029,1.784029,2.394067));
 
 	//SetUp animations 
-	static ConstructorHelpers::FObjectFinder<UAnimBlueprint> AnimBlueprint(TEXT("/Game/TEST/Enemy/Test_Enemy_Stuff/Anims/Enemy_ABP.Enemy_ABP"));
+	//static ConstructorHelpers::FObjectFinder<UAnimBlueprint> AnimBlueprint(TEXT("/Game/TEST/Enemy/Test_Enemy_Stuff/Anims/Enemy_ABP.Enemy_ABP"));
 	
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> enemyAsset(TEXT("/Game/TEST/Enemy/Test_Enemy_Stuff/The_Boss.The_Boss"));
 	if (enemyAsset.Succeeded())
@@ -36,7 +36,7 @@ AEnemyPrototype::AEnemyPrototype()
 		enemyMesh->SetWorldRotation(FRotator(0.0f, -90.0f, 0.0f));
 		enemyMesh->SetRelativeLocation(FVector(0.0f, 0.0f, -41.7699f));
 
-		enemyMesh->AnimClass = AnimBlueprint.Object->GetClass();
+	//	enemyMesh->AnimClass = AnimBlueprint.Object->GetClass();
 		
 		bUseControllerRotationYaw = true;
 		bUseControllerRotationPitch = true;
