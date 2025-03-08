@@ -11,7 +11,8 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Pawn.h"
 #include "Enemy.generated.h"
-
+// Event Dispatchers (Multi Cast Delegates)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAttackEnd);
 UCLASS()
 class SUBMECHANOPHOBIA_API AEnemy : public APawn
 {
@@ -29,24 +30,30 @@ public:
 	virtual void BeginPlay();
 	virtual void Tick(float DeltaTime) ;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	UFUNCTION()
+	
+	UFUNCTION(BlueprintCallable, Category = "Functions")
 	virtual void Attack() ;
 	
 	UPROPERTY(visibleAnywhere,BlueprintReadWrite, Category = "Components" )
-	USceneComponent* Root;
+	TObjectPtr<USceneComponent> Root;
 
 	UPROPERTY(visibleAnywhere,BlueprintReadWrite, Category = "Components" )
-	UCapsuleComponent* CapsuleComponent;
+	TObjectPtr<UCapsuleComponent> CapsuleComponent;
 	
 	UPROPERTY(visibleAnywhere,BlueprintReadWrite, Category = "Components" )
-	USkeletalMeshComponent* enemyMesh;
+	TObjectPtr<USkeletalMeshComponent>  enemyMesh;
 
 	// allows AIController to move the pawn
-	UPROPERTY()
-	UFloatingPawnMovement* MovementComponent;
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	TObjectPtr<UFloatingPawnMovement>  MovementComponent;
 	
 	UPROPERTY()
-	UHealthComponent* HealthComponent;
+	TObjectPtr<UHealthComponent>  HealthComponent;
+
+public:
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnAttackEnd OnAttackEnd;
+	
 
 	uint8 GetDamage() const{return damage;}
 	void SetDamage(const uint8 damage_){damage = damage_;}

@@ -32,8 +32,8 @@ ADrownedCrew::ADrownedCrew()
 		enemyMesh->BodyInstance.bLockZRotation = true;*/
 	}
 	//SetUp animations 
-	static ConstructorHelpers::FObjectFinder<UAnimBlueprint> AnimBlueprint(TEXT("/Game/TEST/Enemy/Test_Enemy_Stuff/Anims/Enemy_ABP.Enemy_ABP"));
-	enemyMesh->AnimClass = AnimBlueprint.Object->GeneratedClass;
+	//static ConstructorHelpers::FObjectFinder<UAnimBlueprint> AnimBlueprint(TEXT("/Game/TEST/Enemy/Test_Enemy_Stuff/Anims/Enemy_ABP.Enemy_ABP"));
+	//enemyMesh->AnimClass = AnimBlueprint.Object->GeneratedClass;
 }
 
 void ADrownedCrew::BeginPlay()
