@@ -4,32 +4,37 @@
 
 #include "CoreMinimal.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "DrawDebugHelpers.h"
 #include "WeaponBase.generated.h"
 
-/**
- * 
- */
+class ASubmechanophobiaCharacter;
+
 UCLASS()
 class SUBMECHANOPHOBIA_API UWeaponBase : public USkeletalMeshComponent
 {
 	GENERATED_BODY()
 	
 public:
-	
 	UPROPERTY()
-	unsigned int Ammo; 
+	unsigned int ammo;
 	
 	UPROPERTY()
 	class UInputMappingContext* FireMappingContext;
-
+	
 	UPROPERTY()
 	class UInputAction* FireAction;
-	
+
+	// function to be overriden for each weapon  
 	UFUNCTION()
 	virtual void Fire();
 
-	UFUNCTION()
-	virtual void Reload();
-
+	//Attaches component to Character
+	UFUNCTION(BlueprintCallable)
+	virtual bool AttachToCharacter(ASubmechanophobiaCharacter* TargetCharacter);
 	
+	//TSubclassOf<ACharacter> BlueprintCharacterClass
+	
+	/** The Character holding this weapon*/
+	ASubmechanophobiaCharacter* Character;
 };
+
