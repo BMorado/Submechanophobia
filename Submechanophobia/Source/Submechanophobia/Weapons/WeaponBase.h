@@ -15,26 +15,25 @@ class SUBMECHANOPHOBIA_API UWeaponBase : public USkeletalMeshComponent
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY()
-	unsigned int ammo;
 	
-	UPROPERTY()
-	class UInputMappingContext* FireMappingContext;
+	// ammo remaining outside loaded magazine 
+	UPROPERTY(EditAnywhere,blueprintReadOnly,Category = "Weapons")
+	 uint8 reserveAmmo;
 	
-	UPROPERTY()
-	class UInputAction* FireAction;
+	UPROPERTY(EditAnywhere,blueprintReadOnly,Category = "Weapons")
+	 uint8 magazineAmmo;
 
-	// function to be overriden for each weapon  
-	UFUNCTION()
-	virtual void Fire();
+	UPROPERTY(EditAnywhere,blueprintReadOnly,Category = "Weapons")
+	float fireRate;
 
-	//Attaches component to Character
-	UFUNCTION(BlueprintCallable)
-	virtual bool AttachToCharacter(ASubmechanophobiaCharacter* TargetCharacter);
+	UPROPERTY(EditAnywhere,blueprintReadOnly,Category = "Weapons")
+	float accuracy; 
 	
-	//TSubclassOf<ACharacter> BlueprintCharacterClass
+	UPROPERTY(EditAnywhere,blueprintReadOnly,Category = "Weapons")
+	float damage;
+
+	UPROPERTY(EditAnywhere,blueprintReadOnly,Category = "Weapons")
+	TObjectPtr<USkeletalMeshComponent> weaponMesh;
 	
-	/** The Character holding this weapon*/
-	ASubmechanophobiaCharacter* Character;
 };
 
