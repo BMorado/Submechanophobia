@@ -54,4 +54,12 @@ bool UWeaponBase::AttachToCharacter(ASubmechanophobiaCharacter* TargetCharacter)
 	}
 
 	return true;
+}
+
+void UWeaponBase::OnGenerateOverlapEventsChanged()
+{
+	Super::OnGenerateOverlapEventsChanged();
+	// Get overlap actor
+	// cast to rut player character
+	// player -> change gun(damage, mesh, fire rate)
 };

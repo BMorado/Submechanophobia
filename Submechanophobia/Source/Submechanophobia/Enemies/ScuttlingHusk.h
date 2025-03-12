@@ -22,13 +22,14 @@ private:
 	AScuttlingHusk();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-
+	UFUNCTION()
+	void AttackEnd();
 	
 	virtual void Attack() override;
 
 	
 
-	
+	FOnMontageEnded MontageEndDelegate;
 	UPROPERTY(VisibleAnywhere,Category = "Animation")
 	TObjectPtr<UAnimMontage> attackMontage;
 	

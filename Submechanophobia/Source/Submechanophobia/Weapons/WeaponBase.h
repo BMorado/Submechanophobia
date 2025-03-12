@@ -31,6 +31,8 @@ public:
 	//Attaches component to Character
 	UFUNCTION(BlueprintCallable)
 	virtual bool AttachToCharacter(ASubmechanophobiaCharacter* TargetCharacter);
+
+	virtual void OnGenerateOverlapEventsChanged() override;
 	
 	//TSubclassOf<ACharacter> BlueprintCharacterClass
 	
