@@ -17,7 +17,7 @@ AEnemy::AEnemy()
 	
 	
 	
-	
+	//
 	// Setup for Capsule collider 
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
 

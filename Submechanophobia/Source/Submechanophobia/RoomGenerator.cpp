@@ -29,7 +29,7 @@ void ARoomGenerator::BeginPlay()
 	for (const AActor* list : spawnPointsList)
 	{
 		FVector TempLocation = list->GetActorLocation();
-		World->SpawnActor<AActor>(defaultRoom,TempLocation+ FVector(1800.0f,0.0f,0.0f),list->GetActorRotation() + FRotator(0.0f,90.0f,0.0f));
+		World->SpawnActor<AActor>(defaultRoom,TempLocation+ FVector(-1800.0f,0.0f,0.0f),list->GetActorRotation() + FRotator(0.0f,90.0f,0.0f));
 	}
 	
 }

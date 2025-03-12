@@ -42,7 +42,7 @@ public:
 	
 	UPROPERTY(visibleAnywhere,BlueprintReadWrite, Category = "Components" )
 	TObjectPtr<USkeletalMeshComponent>  enemyMesh;
-
+	//
 	// allows AIController to move the pawn
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	TObjectPtr<UFloatingPawnMovement>  MovementComponent;
