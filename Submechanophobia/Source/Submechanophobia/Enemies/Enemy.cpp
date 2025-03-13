@@ -78,3 +78,7 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+void AEnemy::PlayAttackAnim()
+{
+}
+

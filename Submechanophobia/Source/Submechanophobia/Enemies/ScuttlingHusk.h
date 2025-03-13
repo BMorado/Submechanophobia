@@ -26,7 +26,7 @@ private:
 	void AttackEnd();
 	
 	virtual void Attack() override;
-
+	virtual void PlayAttackAnim() override;
 	
 
 	FOnMontageEnded MontageEndDelegate;

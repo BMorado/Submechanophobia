@@ -63,8 +63,8 @@ AScuttlingHusk::AScuttlingHusk()
 void AScuttlingHusk::BeginPlay()
 {
 	Super::BeginPlay();
-	
 	//GetWorld()->GetTimerManager().SetTimer(timer,this,&AScuttlingHusk::Attack,0.25f,true);
+	
 	
 	
 }
@@ -72,36 +72,45 @@ void AScuttlingHusk::BeginPlay()
 void AScuttlingHusk::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 }
 
 void AScuttlingHusk::AttackEnd()
 {
 	OnAttackEnd.Broadcast();
+	GetWorld()->GetTimerManager().ClearTimer(timer);
 }
 
 void AScuttlingHusk::Attack() 
 {
 	Super::Attack();
 
-		if (UAnimInstance* AnimInstance = enemyMesh->GetAnimInstance())
-		{
-			AnimInstance->Montage_Play(attackMontage);
-			AnimInstance->Montage_SetEndDelegate(MontageEndDelegate, attackMontage);
-			
-		}
+		
 	UE_LOG(LogTemp, Log, TEXT("Enemy Mesh is not assigned!"));
-
+	
 	FVector start = enemyMesh->GetSocketLocation("RFH_Attack_Socket");
 	FVector end = enemyMesh->GetSocketLocation("RFH_Attack_Socket");
 	
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(GetOwner());
 	FHitResult hits;
-	UKismetSystemLibrary::SphereTraceSingle(GetWorld(),start,end,30.0f,UEngineTypes::ConvertToTraceType(ECC_Camera)
+	UKismetSystemLibrary::SphereTraceSingle(
+		GetWorld(),start,end,30.0f,UEngineTypes::ConvertToTraceType(ECC_Camera)
 		,false,ActorsToIgnore,EDrawDebugTrace::ForDuration,hits,true);
 	
 	UGameplayStatics::ApplyDamage(hits.GetActor(),damage,nullptr,this,nullptr);
 
 	
+}
+
+void AScuttlingHusk::PlayAttackAnim()
+{
+	Super::PlayAttackAnim();
+	if (UAnimInstance* AnimInstance = enemyMesh->GetAnimInstance())
+	{
+		AnimInstance->Montage_Play(attackMontage);
+		GetWorld()->GetTimerManager().SetTimer(timer,this,&AScuttlingHusk::Attack,0.05f,true);
+		AnimInstance->Montage_SetEndDelegate(MontageEndDelegate, attackMontage);
+			
+	}
 }

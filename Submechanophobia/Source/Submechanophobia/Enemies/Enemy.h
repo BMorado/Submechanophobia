@@ -30,6 +30,9 @@ public:
 	virtual void BeginPlay();
 	virtual void Tick(float DeltaTime) ;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION(BlueprintCallable, Category = "Functions")
+	virtual void PlayAttackAnim();
 	
 	UFUNCTION(BlueprintCallable, Category = "Functions")
 	virtual void Attack() ;
@@ -49,8 +52,7 @@ public:
 	
 	UPROPERTY()
 	TObjectPtr<UHealthComponent>  HealthComponent;
-
-public:
+	
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnAttackEnd OnAttackEnd;
 	
