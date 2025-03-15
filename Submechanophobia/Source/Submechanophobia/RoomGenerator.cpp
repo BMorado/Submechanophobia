@@ -22,7 +22,7 @@ void ARoomGenerator::BeginPlay()
 	while (roomsSpawned < singleRooms.Num())
 	{
 		AActor* placedRoom = spawnPointsList.Pop();
-		spawnedPuzzles.Emplace(World->SpawnActor<APuzzle>(singleRooms[roomsSpawned],placedRoom->GetActorLocation() + FVector(-1800.0f,0.0f,0.0f),placedRoom->GetTransform().Rotator()));
+		spawnedPuzzles.Emplace(World->SpawnActor<APuzzle>(singleRooms[roomsSpawned],placedRoom->GetActorLocation() ,placedRoom->GetTransform().Rotator()));
 		roomsSpawned++;
 	}
 	// After all the puzzle rooms are spawned fill all the leftover spawn points with the default type room
@@ -32,7 +32,7 @@ void ARoomGenerator::BeginPlay()
 		FRotator TempRotation = list->GetActorRotation();
 		UE_LOG(LogTemp, Log, TEXT("%f"),TempRotation.Yaw);
 		
-		World->SpawnActor<AActor>(defaultRoom,TempLocation+ FVector(-1800.0f,0.0f,0.0f), TempRotation);
+		World->SpawnActor<AActor>(defaultRoom,TempLocation, TempRotation);
 	}
 	
 }
