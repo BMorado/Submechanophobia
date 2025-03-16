@@ -50,6 +50,7 @@ void AAPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	if (UEnhancedInputComponent* EnhancedInput = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &AAPlayerCharacter::StartJump);
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &AAPlayerCharacter::StopJump);
+		EnhancedInput->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::RayCast);
 		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Move);
 		EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Look);
 	}
@@ -84,5 +85,29 @@ void AAPlayerCharacter::Look(const FInputActionValue& Value)
 
 	AddControllerYawInput(LookValue.X);
 	AddControllerPitchInput(LookValue.Y);
+}
+
+void AAPlayerCharacter::RayCast()
+{
+	FHitResult* HitResult = new FHitResult();
+	FVector StartTrace = Camera->GetComponentLocation();
+	FVector ForwardVector = Camera->GetForwardVector();
+	FVector EndTrace =  (ForwardVector * 5000.f) + StartTrace;
+	FCollisionQueryParams* CQP = new FCollisionQueryParams();
+
+	if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility, *CQP))
+	{
+		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true);
+
+		if (HitResult->GetActor() != nullptr)
+		{
+			//if actor has health?
+			//then get weapon if weapon not in player
+			//or weapon.getdamage
+			//Check if health <0 play death montage and delete actor. 
+			HitResult->GetActor()->Destroy();
+		}
+	}
+
 }
 
