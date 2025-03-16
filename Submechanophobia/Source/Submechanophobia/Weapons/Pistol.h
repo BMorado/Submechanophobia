@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "WeaponBase.h"
-#include "Submechanophobia/Enemies/Enemy.h"
 #include "Pistol.generated.h"
 
 /**
@@ -14,5 +13,5 @@ UCLASS()
 class SUBMECHANOPHOBIA_API UPistol : public UWeaponBase
 {
 	GENERATED_BODY()
-	
+	UPistol(); 
 };

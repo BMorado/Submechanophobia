@@ -3,9 +3,18 @@
 
 #include "Pistol.h"
 
-#include "Camera/CameraComponent.h"
-#include "Engine/World.h"
-#include "Submechanophobia/SubmechanophobiaCharacter.h"
 
+UPistol::UPistol()
+{
+	reserveAmmo = 10;
+
+	magazineAmmo = 5;
+
+	fireRate = 0.5f;
+
+	accuracy = 1.5f;
+	
+	damage = 1.0f;
+}
 
 
