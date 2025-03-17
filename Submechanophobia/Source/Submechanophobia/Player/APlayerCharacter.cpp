@@ -19,6 +19,17 @@ AAPlayerCharacter::AAPlayerCharacter()
 	bUseControllerRotationPitch = true;
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
+
+	
+	// load our animation montage
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> MeleeAttackMontageObject(
+		TEXT("/Script/Engine.AnimMontage'/Game/TEST/Enemy/Test_Enemy_Stuff/Anims/Shooting_Montage.Shooting_Montage'")
+	);
+
+	if (MeleeAttackMontageObject.Succeeded())
+	{
+		MeleeAttackMontage = MeleeAttackMontageObject.Object;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -97,7 +108,8 @@ void AAPlayerCharacter::RayCast()
 
 	if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility, *CQP))
 	{
-		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true);
+		PlayAnimMontage(MeleeAttackMontage);
+		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 255), true);
 
 		if (HitResult->GetActor() != nullptr)
 		{

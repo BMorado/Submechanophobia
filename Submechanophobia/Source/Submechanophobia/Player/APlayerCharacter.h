@@ -51,6 +51,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	UInputAction* LookAction;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation");
+	UAnimMontage* MeleeAttackMontage;
 
 	void StartJump();
 	void StopJump();
