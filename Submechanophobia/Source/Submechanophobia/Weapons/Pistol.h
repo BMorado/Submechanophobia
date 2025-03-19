@@ -10,8 +10,8 @@
  * 
  */
 UCLASS()
-class SUBMECHANOPHOBIA_API UPistol : public UWeaponBase
+class SUBMECHANOPHOBIA_API AUPistol : public AUWeaponBase
 {
 	GENERATED_BODY()
-	UPistol(); 
+	AUPistol(); 
 };

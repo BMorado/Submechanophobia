@@ -1,11 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Submechanophobia/Player/APlayerCharacter.h"
-#include "Camera/CameraComponent.h"
-#include "EnhancedInputSubsystems.h"
+
 #include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "IPropertyTable.h"
+#include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
+#include "Submechanophobia/Weapons/WeaponBase.h"
+#include "UniversalObjectLocators/UniversalObjectLocatorUtils.h"
+
+
 
 // Sets default values
 AAPlayerCharacter::AAPlayerCharacter()
@@ -98,8 +103,15 @@ void AAPlayerCharacter::Look(const FInputActionValue& Value)
 	AddControllerPitchInput(LookValue.Y);
 }
 
+
+
+
+
+
+
 void AAPlayerCharacter::RayCast()
 {
+	
 	FHitResult* HitResult = new FHitResult();
 	FVector StartTrace = Camera->GetComponentLocation();
 	FVector ForwardVector = Camera->GetForwardVector();
@@ -118,8 +130,27 @@ void AAPlayerCharacter::RayCast()
 			//or weapon.getdamage
 			//Check if health <0 play death montage and delete actor. 
 			HitResult->GetActor()->Destroy();
+			
 		}
 	}
+
+}
+
+
+
+void AAPlayerCharacter::AddWeapon(TSubclassOf<AUWeaponBase> weapon)
+{
+	FVector SpawnLocation = Camera->GetForwardVector() + GetActorLocation();
+	FRotator SpawnRotation = Camera->GetComponentRotation();
+	FActorSpawnParameters SpawnInfo;
+	
+	AUWeaponBase* NewWeapon = GetWorld()->SpawnActor<AUWeaponBase>(weapon, SpawnLocation, SpawnRotation, SpawnInfo);
+	FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true);
+	
+	currentWeapon = NewWeapon->GetClass();
+	
+	NewWeapon->AttachToComponent(GetMesh(), AttachRules);  // Make sure you have a valid socket name like "WeaponSocket"
+
 
 }
 

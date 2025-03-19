@@ -4,7 +4,7 @@
 #include "Pistol.h"
 
 
-UPistol::UPistol()
+AUPistol::AUPistol()
 {
 	reserveAmmo = 10;
 
