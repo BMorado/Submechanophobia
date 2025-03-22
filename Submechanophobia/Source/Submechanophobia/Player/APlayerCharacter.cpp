@@ -7,6 +7,7 @@
 #include "IPropertyTable.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
+#include "Submechanophobia/Enemies/Enemy.h"
 #include "Submechanophobia/Weapons/WeaponBase.h"
 #include "UniversalObjectLocators/UniversalObjectLocatorUtils.h"
 
@@ -66,7 +67,7 @@ void AAPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	if (UEnhancedInputComponent* EnhancedInput = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &AAPlayerCharacter::StartJump);
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &AAPlayerCharacter::StopJump);
-		EnhancedInput->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::RayCast);
+		EnhancedInput->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::FireWeapon);
 		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Move);
 		EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Look);
 	}
@@ -104,12 +105,22 @@ void AAPlayerCharacter::Look(const FInputActionValue& Value)
 }
 
 
+void AAPlayerCharacter::FireWeapon()
+{
+	if (currentWeapon)
+	{
+		if (currentWeapon->magazineAmmo > 0 )
+		{
+			FHitResult* HitResult = RayCast();
+			currentWeapon->magazineAmmo--;
+			UGameplayStatics::ApplyDamage(HitResult->GetActor(),currentWeapon->damage,nullptr,this,nullptr); 
+		}
+	}
+	
+}
 
 
-
-
-
-void AAPlayerCharacter::RayCast()
+FHitResult* AAPlayerCharacter::RayCast()
 {
 	
 	FHitResult* HitResult = new FHitResult();
@@ -117,23 +128,14 @@ void AAPlayerCharacter::RayCast()
 	FVector ForwardVector = Camera->GetForwardVector();
 	FVector EndTrace =  (ForwardVector * 5000.f) + StartTrace;
 	FCollisionQueryParams* CQP = new FCollisionQueryParams();
-
+	
 	if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility, *CQP))
 	{
-		PlayAnimMontage(MeleeAttackMontage);
+		//PlayAnimMontage(MeleeAttackMontage);
 		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 255), true);
-
-		if (HitResult->GetActor() != nullptr)
-		{
-			//if actor has health?
-			//then get weapon if weapon not in player
-			//or weapon.getdamage
-			//Check if health <0 play death montage and delete actor. 
-			HitResult->GetActor()->Destroy();
-			
-		}
+		return HitResult; 
 	}
-
+	return  HitResult;
 }
 
 
@@ -147,10 +149,10 @@ void AAPlayerCharacter::AddWeapon(TSubclassOf<AUWeaponBase> weapon)
 	AUWeaponBase* NewWeapon = GetWorld()->SpawnActor<AUWeaponBase>(weapon, SpawnLocation, SpawnRotation, SpawnInfo);
 	FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true);
 	
-	currentWeapon = NewWeapon->GetClass();
+	currentWeapon = NewWeapon;
 	
 	NewWeapon->AttachToComponent(GetMesh(), AttachRules);  // Make sure you have a valid socket name like "WeaponSocket"
-
+	//WeaponSocket
 
 }
 

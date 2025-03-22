@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Enemies/Enemy.h"
+#include "Enemy.h"
 #include "GuardianLeviathanBoss.generated.h"
 
 /**
@@ -15,7 +15,7 @@ class SUBMECHANOPHOBIA_API AGuardianLeviathanBoss : public AEnemy
 	GENERATED_BODY()
 	
 public:
-    AGuardianLeviathan();
+    AGuardianLeviathanBoss();
 
 protected:
     virtual void BeginPlay() override;
@@ -29,13 +29,26 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss Stats")
     int CurrentStage;
+    
 
-    void TakeDamage(float DamageAmount);
+
+   
+
+    UFUNCTION(BlueprintCallable, Category = "Boss Actions")
+
     void EnterNextStage();
+    
+    FTimerHandle FireTimerHandle;
+
+    FTimerHandle StopFireHandle;
 
     UFUNCTION(BlueprintCallable, Category = "Boss Actions")
     void StartFireBreath();
+    UFUNCTION(BlueprintCallable, Category = "Boss Actions")
+
     void ApplyFireDamage();
+    UFUNCTION(BlueprintCallable, Category = "Boss Actions")
+
     void StopFireBreath();
 
     UFUNCTION(BlueprintCallable, Category = "Boss Actions")

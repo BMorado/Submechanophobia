@@ -56,13 +56,14 @@ protected:
 	UAnimMontage* MeleeAttackMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "gameplay");
-	TSubclassOf<AUWeaponBase> currentWeapon;
+	AUWeaponBase* currentWeapon;
 	
 	void StartJump();
 	void StopJump();
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-	void RayCast();
+	void FireWeapon(); 
+	FHitResult* RayCast();
 	
 	UFUNCTION(BlueprintCallable)
 	void AddWeapon(TSubclassOf<AUWeaponBase> weapon); 
