@@ -5,14 +5,15 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+
+#include "Submechanophobia/Weapons/WeaponBase.h"
 #include "APlayerCharacter.generated.h"
 
 class UInputMappingContext;
 class UInputAction;
 
-
 UCLASS()
-class SUBMECHANOPHOBIA_API AAPlayerCharacter : public ACharacter
+class SUBMECHANOPHOBIA_API AAPlayerCharacter : public ACharacter 
 {
 	GENERATED_BODY()
 
@@ -43,14 +44,26 @@ protected:
 	UInputAction* JumpAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
+	UInputAction* AttackAction;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	UInputAction* MoveAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	UInputAction* LookAction;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation");
+	UAnimMontage* MeleeAttackMontage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "gameplay");
+	TSubclassOf<AUWeaponBase> currentWeapon;
+	
 	void StartJump();
 	void StopJump();
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-
+	void RayCast();
+	
+	UFUNCTION(BlueprintCallable)
+	void AddWeapon(TSubclassOf<AUWeaponBase> weapon); 
 };

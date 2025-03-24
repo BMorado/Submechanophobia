@@ -10,7 +10,7 @@
 class ASubmechanophobiaCharacter;
 
 UCLASS()
-class SUBMECHANOPHOBIA_API UWeaponBase : public USkeletalMeshComponent
+class SUBMECHANOPHOBIA_API AUWeaponBase : public AActor
 {
 	GENERATED_BODY()
 	
@@ -32,7 +32,7 @@ public:
 	UPROPERTY(EditAnywhere,blueprintReadOnly,Category = "Weapons")
 	float damage;
 
-	UPROPERTY(EditAnywhere,blueprintReadOnly,Category = "Weapons")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite ,Category = "Weapons")
 	TObjectPtr<USkeletalMeshComponent> weaponMesh;
 	
 };

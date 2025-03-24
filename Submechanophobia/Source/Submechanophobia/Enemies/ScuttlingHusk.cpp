@@ -11,6 +11,8 @@ AScuttlingHusk::AScuttlingHusk()
 {
 
 	MontageEndDelegate.BindUFunction(this, FName("AttackEnd"));
+
+	MovementComponent->MaxSpeed = 400;
 	
 	CapsuleComponent->SetRelativeScale3D(FVector(3.066639f, 3.066639, 2.818257));
 	CapsuleComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 90.0f));

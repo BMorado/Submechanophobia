@@ -1,11 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Submechanophobia/Player/APlayerCharacter.h"
-#include "Camera/CameraComponent.h"
-#include "EnhancedInputSubsystems.h"
+
 #include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "IPropertyTable.h"
+#include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
+#include "Submechanophobia/Weapons/WeaponBase.h"
+#include "UniversalObjectLocators/UniversalObjectLocatorUtils.h"
+
+
 
 // Sets default values
 AAPlayerCharacter::AAPlayerCharacter()
@@ -19,6 +24,17 @@ AAPlayerCharacter::AAPlayerCharacter()
 	bUseControllerRotationPitch = true;
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
+
+	
+	// load our animation montage
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> MeleeAttackMontageObject(
+		TEXT("/Script/Engine.AnimMontage'/Game/TEST/Enemy/Test_Enemy_Stuff/Anims/Shooting_Montage.Shooting_Montage'")
+	);
+
+	if (MeleeAttackMontageObject.Succeeded())
+	{
+		MeleeAttackMontage = MeleeAttackMontageObject.Object;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -50,6 +66,7 @@ void AAPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	if (UEnhancedInputComponent* EnhancedInput = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &AAPlayerCharacter::StartJump);
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &AAPlayerCharacter::StopJump);
+		EnhancedInput->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::RayCast);
 		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Move);
 		EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Look);
 	}
@@ -84,5 +101,56 @@ void AAPlayerCharacter::Look(const FInputActionValue& Value)
 
 	AddControllerYawInput(LookValue.X);
 	AddControllerPitchInput(LookValue.Y);
+}
+
+
+
+
+
+
+
+void AAPlayerCharacter::RayCast()
+{
+	
+	FHitResult* HitResult = new FHitResult();
+	FVector StartTrace = Camera->GetComponentLocation();
+	FVector ForwardVector = Camera->GetForwardVector();
+	FVector EndTrace =  (ForwardVector * 5000.f) + StartTrace;
+	FCollisionQueryParams* CQP = new FCollisionQueryParams();
+
+	if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility, *CQP))
+	{
+		PlayAnimMontage(MeleeAttackMontage);
+		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 255), true);
+
+		if (HitResult->GetActor() != nullptr)
+		{
+			//if actor has health?
+			//then get weapon if weapon not in player
+			//or weapon.getdamage
+			//Check if health <0 play death montage and delete actor. 
+			HitResult->GetActor()->Destroy();
+			
+		}
+	}
+
+}
+
+
+
+void AAPlayerCharacter::AddWeapon(TSubclassOf<AUWeaponBase> weapon)
+{
+	FVector SpawnLocation = Camera->GetForwardVector() + GetActorLocation();
+	FRotator SpawnRotation = Camera->GetComponentRotation();
+	FActorSpawnParameters SpawnInfo;
+	
+	AUWeaponBase* NewWeapon = GetWorld()->SpawnActor<AUWeaponBase>(weapon, SpawnLocation, SpawnRotation, SpawnInfo);
+	FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true);
+	
+	currentWeapon = NewWeapon->GetClass();
+	
+	NewWeapon->AttachToComponent(GetMesh(), AttachRules);  // Make sure you have a valid socket name like "WeaponSocket"
+
+
 }
 
