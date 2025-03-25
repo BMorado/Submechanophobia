@@ -12,12 +12,6 @@ AEnemy::AEnemy()
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	// Setup Root component 
-	
-	
-	
-	
-	//
 	// Setup for Capsule collider 
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
 
@@ -27,7 +21,7 @@ AEnemy::AEnemy()
 	CapsuleComponent->SetSimulatePhysics(false);
 
 	RootComponent = CapsuleComponent;
-	
+
 	//CapsuleComponent->BodyInstance.bLockXRotation = true;
 	CapsuleComponent->BodyInstance.bLockYRotation = true;
 	CapsuleComponent->BodyInstance.bLockZRotation = true;
@@ -39,11 +33,10 @@ AEnemy::AEnemy()
 
 	// Setup Health Component
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
-	HealthComponent->Initialize(100);
+	HealthComponent->SetMaxHealth(100);
 
 	enemyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Enemy Mesh"));
 	enemyMesh->SetCanEverAffectNavigation(false);
-
 	
 	// Setup movement component 
 	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
@@ -54,7 +47,7 @@ AEnemy::AEnemy()
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	SpawnLocation = GetActorLocation();
 }
 
 // Called every frame
@@ -76,6 +69,12 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+float AEnemy::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	return Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 }
 
 void AEnemy::PlayAttackAnim()

@@ -24,14 +24,21 @@ private:
 	virtual void Tick(float DeltaTime) override;
 	UFUNCTION()
 	void AttackEnd();
+	UFUNCTION()
+	void DamagedEnd();
 	
 	virtual void Attack() override;
 	virtual void PlayAttackAnim() override;
-	
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
-	FOnMontageEnded MontageEndDelegate;
+	FOnMontageEnded AttackMontageEndDelegate;
+	FOnMontageEnded DamagedMontageEndDelegate;
+	
 	UPROPERTY(VisibleAnywhere,Category = "Animation")
 	TObjectPtr<UAnimMontage> attackMontage;
+
+	UPROPERTY(VisibleAnywhere,Category = "Animation")
+	TObjectPtr<UAnimMontage> damagedMontage;
 	
 	uint8 damage = 10;
 	FTimerHandle Timer;

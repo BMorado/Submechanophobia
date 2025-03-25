@@ -1,25 +1,25 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "ScuttlingHusk.h"
 #include "ScuttlingHuskAIC.h"
-#include "WorldPartition/ContentBundle/ContentBundleLog.h"
 
+// make health a little random 
 
-// TODO: scale the capsule to the correct size, fobjetc find the mesh and check if mesh is valid, set enemy mesh to found mesh 
 AScuttlingHusk::AScuttlingHusk()
 {
-
-	MontageEndDelegate.BindUFunction(this, FName("AttackEnd"));
-
+	AttackMontageEndDelegate.BindUFunction(this, FName("AttackEnd"));
+	DamagedMontageEndDelegate.BindUFunction(this, FName("DamagedEnd"));
+	
+	HealthComponent->SetMaxHealth(100.0f);
+	HealthComponent->SetHealth(HealthComponent->GetMaxHealth());
+	
+	// Set Max movement speed
 	MovementComponent->MaxSpeed = 400;
 	
+	// Set Up capsule Size
 	CapsuleComponent->SetRelativeScale3D(FVector(3.066639f, 3.066639, 2.818257));
 	CapsuleComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 90.0f));
 	CapsuleComponent->SetRelativeLocation(FVector(14.1915f, 0.0f, 58.972f));
-	//CapsuleComponent->SetSimulatePhysics(true);
 	
-	// Set up skel mesh
+	// Set up skeletal mesh
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> enemyAsset(TEXT("/Game/Boss_assets/Scuttling_Husk/scuttling_husk_exp_feb2.scuttling_husk_exp_feb2"));
 	if (enemyAsset.Succeeded())
 	{
@@ -29,11 +29,6 @@ AScuttlingHusk::AScuttlingHusk()
 		enemyMesh->SetWorldScale3D(FVector(9.0));
 		enemyMesh->SetRelativeRotation(FRotator(-90.0, -90.0f, 0.0f));
 		enemyMesh->SetRelativeLocation(FVector(0.0f, 23.0f, 0.0f));
-		
-		// Stops you from being able to flip the Enemy 
-		//enemyMesh->BodyInstance.bLockXRotation = true;
-		//enemyMesh->BodyInstance.bLockYRotation = true;
-		//enemyMesh->BodyInstance.bLockZRotation = true;
 	}
 
 	// Load ABP Class
@@ -50,31 +45,20 @@ AScuttlingHusk::AScuttlingHusk()
 		AIControllerClass = AIContollerClass;
 		AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 		bUseControllerRotationYaw = true;
-		//bUseControllerRotationPitch = true;
-		//bUseControllerRotationRoll = true;
 	}
+	// Load Animations
 	attackMontage = LoadObject<UAnimMontage>(nullptr, TEXT("/Game/Boss_assets/Scuttling_Husk/ScuttlingHusk_Attack_Montage.ScuttlingHusk_Attack_Montage"));
-	/*static ConstructorHelpers::FObjectFinder<UAnimMontage> AttackMontage(TEXT("/Game/Boss_assets/Scuttling_Husk/Crab_Attack_Montage.Crab_Attack_Montage"));
-	if (AttackMontage.Succeeded())
-	{
-		attackMontage = AttackMontage.Object;
-	}*/
-	
+	damagedMontage =  LoadObject<UAnimMontage>(nullptr, TEXT("/Game/Boss_assets/Scuttling_Husk/crab_damaged_Montage.crab_damaged_Montage"));
 }
 
 void AScuttlingHusk::BeginPlay()
 {
 	Super::BeginPlay();
-	//GetWorld()->GetTimerManager().SetTimer(timer,this,&AScuttlingHusk::Attack,0.25f,true);
-	
-	
-	
 }
 
 void AScuttlingHusk::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
 }
 
 void AScuttlingHusk::AttackEnd()
@@ -83,13 +67,16 @@ void AScuttlingHusk::AttackEnd()
 	GetWorld()->GetTimerManager().ClearTimer(timer);
 }
 
+void AScuttlingHusk::DamagedEnd()
+{
+		isDamagable = true;
+		MovementComponent->MaxSpeed = 400.0f;
+		
+}
+
 void AScuttlingHusk::Attack() 
 {
 	Super::Attack();
-
-		
-	UE_LOG(LogTemp, Log, TEXT("Enemy Mesh is not assigned!"));
-	
 	FVector start = enemyMesh->GetSocketLocation("RFH_Attack_Socket");
 	FVector end = enemyMesh->GetSocketLocation("RFH_Attack_Socket");
 	
@@ -101,7 +88,6 @@ void AScuttlingHusk::Attack()
 		,false,ActorsToIgnore,EDrawDebugTrace::ForDuration,hits,true);
 	
 	UGameplayStatics::ApplyDamage(hits.GetActor(),damage,nullptr,this,nullptr);
-
 	
 }
 
@@ -112,7 +98,28 @@ void AScuttlingHusk::PlayAttackAnim()
 	{
 		AnimInstance->Montage_Play(attackMontage);
 		GetWorld()->GetTimerManager().SetTimer(timer,this,&AScuttlingHusk::Attack,0.05f,true);
-		AnimInstance->Montage_SetEndDelegate(MontageEndDelegate, attackMontage);
-			
+		AnimInstance->Montage_SetEndDelegate(AttackMontageEndDelegate, attackMontage);
 	}
+}
+
+float AScuttlingHusk::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+	class AController* EventInstigator, AActor* DamageCauser)
+{
+	if (HealthComponent->GetCurrentHealth() <= 0.0f)
+	{
+		this->Destroy();
+	}
+	else if (HealthComponent->GetCurrentHealth() >= 0.0f)
+	{
+		if (isDamagable == true)
+		{
+			UAnimInstance* AnimInstance = enemyMesh->GetAnimInstance();
+			AnimInstance->Montage_Play(damagedMontage);
+			AnimInstance->Montage_SetEndDelegate(DamagedMontageEndDelegate, damagedMontage);
+			MovementComponent->MaxSpeed = 0;
+			isDamagable = false;
+		}
+		HealthComponent->TakeDamage(DamageAmount);
+	}
+	return DamageAmount;
 }

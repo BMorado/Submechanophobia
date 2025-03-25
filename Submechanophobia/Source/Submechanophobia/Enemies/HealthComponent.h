@@ -13,17 +13,17 @@ class SUBMECHANOPHOBIA_API UHealthComponent : public UActorComponent
 	GENERATED_BODY()
 private:
 	// uint8 is unsigned and between 0 - 255
-	uint8 currentHealth;
-	uint8 maxHealth;
+	float currentHealth;
+	float maxHealth;
 public:	
 	// Sets default values for this component's properties
 	UHealthComponent();
-	void Initialize(uint8 MaxHealth_);
-	uint8 GetCurrentHealth();
-	uint8 GetMaxHealth();
-	void TakeDamage(uint8 Damage);
-	void AddHealth(uint8 health);
-	void SetHealth(uint8 health);
+	void SetMaxHealth(float MaxHealth_);
+	float GetCurrentHealth() const;
+	float GetMaxHealth() const;
+	void TakeDamage(float damage_);
+	void AddHealth(float health_);
+	void SetHealth(float health_);
 	
 protected:
 	// Called when the game starts

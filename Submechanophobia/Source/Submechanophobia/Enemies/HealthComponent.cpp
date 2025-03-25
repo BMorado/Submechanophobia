@@ -11,37 +11,37 @@ UHealthComponent::UHealthComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UHealthComponent::Initialize(uint8 MaxHealth_)
+void UHealthComponent::SetMaxHealth(float MaxHealth_)
 {
 	maxHealth = MaxHealth_;
 	currentHealth = maxHealth;
 }
 
-uint8 UHealthComponent::GetCurrentHealth()
+float UHealthComponent::GetCurrentHealth() const
 {
 	return currentHealth;
 }
 
-uint8 UHealthComponent::GetMaxHealth()
+float UHealthComponent::GetMaxHealth() const
 {
 	return maxHealth;
 }
 
-void UHealthComponent::TakeDamage(uint8 Damage)
+void UHealthComponent::TakeDamage(float damage_)
 {
 	// Clamp makes it so you cant go over or under the min or max
-	currentHealth = FMath::Clamp(currentHealth- Damage, 0, maxHealth);
+	currentHealth = FMath::Clamp(currentHealth- damage_, 0, maxHealth);
 }
 
-void UHealthComponent::AddHealth(uint8 addedHealth_)
+void UHealthComponent::AddHealth(float health_)
 {
-	currentHealth = FMath::Clamp(currentHealth + addedHealth_, 0, maxHealth);
+	currentHealth = FMath::Clamp(currentHealth + health_, 0, maxHealth);
 }
 
 // allows you to set health to any value you want this can be over max  
-void UHealthComponent::SetHealth(uint8 health)
+void UHealthComponent::SetHealth(float health_)
 {
-	currentHealth = health;
+	currentHealth = health_;
 }
 
 inline void UHealthComponent::BeginPlay()
