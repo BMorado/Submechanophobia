@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS(Blueprintable)
+UCLASS()
 class SUBMECHANOPHOBIA_API AGuardianLeviathanBoss : public AEnemy
 {
 	GENERATED_BODY()
@@ -21,40 +21,76 @@ protected:
     virtual void BeginPlay() override;
 
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
-    class AGuardianLeviathanAIC* BossAIC;
+    // --- Stage Tracking ---
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss Stats")
+    float Health = 100.0f;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss Stats")
-    float Health;
+    int CurrentStage = 1;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss Stats")
-    int CurrentStage;
-    
-
-
-   
-
-    UFUNCTION(BlueprintCallable, Category = "Boss Actions")
-
+    UFUNCTION(BlueprintCallable)
     void EnterNextStage();
-    
-    FTimerHandle FireTimerHandle;
 
+    UFUNCTION()
+    void OnBossDamaged(float CurrentHealth);
+
+
+    // --- AI Controller Reference if using C++ instead of BP ---
+    /*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+    class AGuardianLeviathanAIC* BossAIC;*/
+
+    // --- Anim Montages ---
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss|Animation")
+    UAnimMontage* FireMontage;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss|Animation")
+    UAnimMontage* ScreechMontage;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss|Animation")
+    UAnimMontage* LungeMontage;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss|Animation")
+    UAnimMontage* TransitionMontage;
+
+    // --- Animation Events ---
+    FOnMontageEnded MontageEndDelegate;
+
+    UFUNCTION()
+    void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+    // --- Timer Handles ---
+    FTimerHandle FireTimerHandle;
     FTimerHandle StopFireHandle;
 
-    UFUNCTION(BlueprintCallable, Category = "Boss Actions")
-    void StartFireBreath();
-    UFUNCTION(BlueprintCallable, Category = "Boss Actions")
+    // --- Attack Calls (for BT or Blueprint) ---
+    UFUNCTION(BlueprintCallable)
+    void FireAttack();
 
+    UFUNCTION(BlueprintCallable)
+    void ScreechAttack();
+
+    UFUNCTION(BlueprintCallable)
+    void LungeAttack();
+
+    virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+        class AController* EventInstigator, AActor* DamageCauser) override;
+
+    // --- Movements -- 
+    UFUNCTION(BlueprintCallable)
+    void TransitionOut();
+
+    UFUNCTION(BlueprintCallable)
+    void MoveToNewHole();
+
+    int32 LastHoleIndex = -1;  // Stores previously used index
+
+    // --- Internal Helpers ---
     void ApplyFireDamage();
-    UFUNCTION(BlueprintCallable, Category = "Boss Actions")
-
     void StopFireBreath();
 
-    UFUNCTION(BlueprintCallable, Category = "Boss Actions")
-    void StartScreech();
+    // --- Mesh stuff ---
 
-    UFUNCTION(BlueprintCallable, Category = "Boss Actions")
-    void LungeAtTarget(AActor* Target);
+   /* UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+    USkeletalMeshComponent* enemyMesh;*/
 
 };
