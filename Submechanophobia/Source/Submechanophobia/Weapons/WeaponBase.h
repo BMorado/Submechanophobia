@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Components/SphereComponent.h"
 #include "WeaponBase.generated.h"
 
 class ASubmechanophobiaCharacter;
@@ -31,9 +32,19 @@ public:
 	
 	UPROPERTY(EditAnywhere,blueprintReadOnly,Category = "Weapons")
 	float damage;
-
+	
+	UPROPERTY(EditAnywhere,blueprintReadOnly,Category = "Weapons")
+	bool isPrimary;
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite ,Category = "Weapons")
 	TObjectPtr<USkeletalMeshComponent> weaponMesh;
-	
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite ,Category = "Weapons")
+	TObjectPtr<USphereComponent> SphereComponent;
+
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, 
+						UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, 
+						bool bFromSweep, const FHitResult& SweepResult);
 };
 

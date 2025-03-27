@@ -4,12 +4,12 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "IPropertyTable.h"
+
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "Submechanophobia/Enemies/Enemy.h"
 #include "Submechanophobia/Weapons/WeaponBase.h"
-#include "UniversalObjectLocators/UniversalObjectLocatorUtils.h"
+ 
 
 
 
@@ -70,6 +70,7 @@ void AAPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInput->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::FireWeapon);
 		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Move);
 		EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Look);
+		EnhancedInput->BindAction(swapToPrimaryAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::SwapWeaponPrimary);
 	}
 }
 
@@ -105,6 +106,7 @@ void AAPlayerCharacter::Look(const FInputActionValue& Value)
 }
 
 
+
 void AAPlayerCharacter::FireWeapon()
 {
 	if (currentWeapon)
@@ -116,6 +118,18 @@ void AAPlayerCharacter::FireWeapon()
 			UGameplayStatics::ApplyDamage(HitResult->GetActor(),currentWeapon->damage,nullptr,this,nullptr); 
 		}
 	}
+	
+}
+
+void AAPlayerCharacter::SwapWeaponPrimary()
+{
+	if (PrimaryWeapon && currentWeapon != PrimaryWeapon)
+	{
+		currentWeapon->SetHidden(true);
+		currentWeapon =  PrimaryWeapon;
+		currentWeapon->SetHidden(false); 
+	}
+	
 	
 }
 
@@ -140,18 +154,31 @@ FHitResult* AAPlayerCharacter::RayCast()
 
 
 
-void AAPlayerCharacter::AddWeapon(TSubclassOf<AUWeaponBase> weapon)
+void AAPlayerCharacter::AddWeapon(AUWeaponBase* weapon)
 {
 	FVector SpawnLocation = Camera->GetForwardVector() + GetActorLocation();
 	FRotator SpawnRotation = Camera->GetComponentRotation();
 	FActorSpawnParameters SpawnInfo;
 	
+	
 	AUWeaponBase* NewWeapon = GetWorld()->SpawnActor<AUWeaponBase>(weapon, SpawnLocation, SpawnRotation, SpawnInfo);
 	FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true);
+
+	// if primary weapon already set and a primary weapon is arg, drop current primary into world
+	
+	if (PrimaryWeapon != nullptr && NewWeapon->isPrimary)
+	{
+		PrimaryWeapon = nullptr;
+		static ConstructorHelpers::FClassFinder<UAnimInstance> AnimBlueprint(TEXT("/Game/AI/ScuttlingHuskAI/Anims/Crab_ABP.Crab_ABP_C"));
+		GetWorld()->SpawnActor<AUWeaponBase>(PrimaryWeapon, SpawnLocation, SpawnRotation, SpawnInfo);
+		
+	}
 	
 	currentWeapon = NewWeapon;
 	
 	NewWeapon->AttachToComponent(GetMesh(), AttachRules);  // Make sure you have a valid socket name like "WeaponSocket"
+
+	if (currentWeapon->isPrimary){ PrimaryWeapon = currentWeapon;}
 	//WeaponSocket
 
 }
