@@ -145,14 +145,15 @@ FHitResult* AAPlayerCharacter::RayCast()
 	FVector ForwardVector = Camera->GetForwardVector();
 	FVector EndTrace =  (ForwardVector * 5000.f) + StartTrace;
 	FCollisionQueryParams* CQP = new FCollisionQueryParams();
-	CQP->bIgnoreBlocks = false;
-	if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Camera, *CQP))
-	{
-		//PlayAnimMontage(MeleeAttackMontage);
-		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 255), true);
-		return HitResult; 
-	}
-	return  HitResult;
+
+	CQP->AddIgnoredActor(this);
+	
+	GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Camera, *CQP);
+	
+	//PlayAnimMontage(MeleeAttackMontage);
+	DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 255), true);
+	return HitResult; 
+	
 }
 
 
