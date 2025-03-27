@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/PrimitiveComponent.h" 
 #include "DrawDebugHelpers.h"
 #include "Components/SphereComponent.h"
 #include "WeaponBase.generated.h"
@@ -16,6 +17,8 @@ class SUBMECHANOPHOBIA_API AUWeaponBase : public AActor
 	GENERATED_BODY()
 	
 public:
+
+	AUWeaponBase();
 	
 	// ammo remaining outside loaded magazine 
 	UPROPERTY(EditAnywhere,blueprintReadOnly,Category = "Weapons")
@@ -42,8 +45,10 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite ,Category = "Weapons")
 	TObjectPtr<USphereComponent> SphereComponent;
 
-	UFUNCTION()
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, 
+	bool IsPickedUp = false;
+
+	
+	virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, 
 						UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, 
 						bool bFromSweep, const FHitResult& SweepResult);
 };

@@ -32,7 +32,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	UFUNCTION(BlueprintCallable)
-	void AddWeapon(AUWeaponBase* weapon);
+	void AddWeapon( AUWeaponBase* weapon);
 
 protected:
 	UPROPERTY(EditAnywhere)

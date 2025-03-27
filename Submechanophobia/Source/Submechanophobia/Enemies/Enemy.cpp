@@ -27,8 +27,8 @@ AEnemy::AEnemy()
 	CapsuleComponent->BodyInstance.bLockZRotation = true;
 	
 	// Displays the collider in The editor and game
-	CapsuleComponent->SetHiddenInGame(false);
-	CapsuleComponent->SetVisibility(false);
+	CapsuleComponent->SetHiddenInGame(true);
+	CapsuleComponent->SetVisibility(true);
 	CapsuleComponent->ShapeColor = FColor::Green;
 
 	// Setup Health Component

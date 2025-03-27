@@ -49,6 +49,7 @@ AScuttlingHusk::AScuttlingHusk()
 	// Load Animations
 	attackMontage = LoadObject<UAnimMontage>(nullptr, TEXT("/Game/Boss_assets/Scuttling_Husk/ScuttlingHusk_Attack_Montage.ScuttlingHusk_Attack_Montage"));
 	damagedMontage =  LoadObject<UAnimMontage>(nullptr, TEXT("/Game/Boss_assets/Scuttling_Husk/crab_damaged_Montage.crab_damaged_Montage"));
+
 }
 
 void AScuttlingHusk::BeginPlay()

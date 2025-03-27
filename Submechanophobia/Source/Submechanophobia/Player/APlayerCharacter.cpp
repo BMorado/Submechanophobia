@@ -160,26 +160,16 @@ void AAPlayerCharacter::AddWeapon(AUWeaponBase* weapon)
 	FRotator SpawnRotation = Camera->GetComponentRotation();
 	FActorSpawnParameters SpawnInfo;
 	
-	
-	AUWeaponBase* NewWeapon = GetWorld()->SpawnActor<AUWeaponBase>(weapon, SpawnLocation, SpawnRotation, SpawnInfo);
 	FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true);
-
-	// if primary weapon already set and a primary weapon is arg, drop current primary into world
-	
-	if (PrimaryWeapon != nullptr && NewWeapon->isPrimary)
+	weapon->IsPickedUp = true;
+	if (weapon->isPrimary)
 	{
-		PrimaryWeapon = nullptr;
-		static ConstructorHelpers::FClassFinder<UAnimInstance> AnimBlueprint(TEXT("/Game/AI/ScuttlingHuskAI/Anims/Crab_ABP.Crab_ABP_C"));
-		GetWorld()->SpawnActor<AUWeaponBase>(PrimaryWeapon, SpawnLocation, SpawnRotation, SpawnInfo);
-		
+		PrimaryWeapon = weapon;
 	}
-	
-	currentWeapon = NewWeapon;
-	
-	NewWeapon->AttachToComponent(GetMesh(), AttachRules);  // Make sure you have a valid socket name like "WeaponSocket"
-
-	if (currentWeapon->isPrimary){ PrimaryWeapon = currentWeapon;}
-	//WeaponSocket
-
+	else if (!weapon->isPrimary)
+	{
+		SecondaryWeapon = weapon;
+	}
+	PrimaryWeapon->AttachToComponent(GetMesh(),AttachRules);
 }
 
