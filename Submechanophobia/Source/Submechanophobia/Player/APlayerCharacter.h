@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
-
 #include "Submechanophobia/Weapons/WeaponBase.h"
 #include "APlayerCharacter.generated.h"
 
@@ -33,6 +32,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	UFUNCTION(BlueprintCallable)
 	void AddWeapon( AUWeaponBase* weapon);
+
 
 protected:
 	UPROPERTY(EditAnywhere)
@@ -74,6 +74,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "gameplay");
 	AUWeaponBase* SecondaryWeapon; 
 
+	
 	
 	void StartJump();
 	void StopJump();

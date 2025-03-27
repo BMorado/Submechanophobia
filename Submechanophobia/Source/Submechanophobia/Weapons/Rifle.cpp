@@ -19,7 +19,7 @@ ARifle::ARifle()
 	
 	isPrimary = true;
 
-	
+	IsPickedUp = false;
 
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ARifle::OnOverlapBegin);
 
@@ -27,8 +27,9 @@ ARifle::ARifle()
 	SphereComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 90.0f));
 	SphereComponent->SetRelativeLocation(FVector(0, 0, 0));
 
-	
+	//SphereComponent->SetSimulatePhysics(true);
 	SphereComponent->SetVisibility(true);
+	
 	SphereComponent->ShapeColor = FColor::Green;
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> WeaponMeshAsset(TEXT("/Game/Boss_assets/Scuttling_Husk/scuttling_husk_exp_feb2.scuttling_husk_exp_feb2"));
@@ -46,7 +47,11 @@ ARifle::ARifle()
 void ARifle::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	Super::OnOverlapBegin(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+	
+		Super::OnOverlapBegin(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+		
+	
+	
 	
 	
 }

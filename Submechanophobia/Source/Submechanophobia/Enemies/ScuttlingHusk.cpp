@@ -8,7 +8,7 @@ AScuttlingHusk::AScuttlingHusk()
 	AttackMontageEndDelegate.BindUFunction(this, FName("AttackEnd"));
 	DamagedMontageEndDelegate.BindUFunction(this, FName("DamagedEnd"));
 	
-	HealthComponent->SetMaxHealth(100.0f);
+	HealthComponent->SetMaxHealth(1.0f);
 	HealthComponent->SetHealth(HealthComponent->GetMaxHealth());
 	
 	// Set Max movement speed

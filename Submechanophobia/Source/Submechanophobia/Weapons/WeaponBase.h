@@ -14,12 +14,13 @@ class ASubmechanophobiaCharacter;
 UCLASS()
 class SUBMECHANOPHOBIA_API AUWeaponBase : public AActor
 {
+public:
 	GENERATED_BODY()
 	
-public:
+
 
 	AUWeaponBase();
-	
+
 	// ammo remaining outside loaded magazine 
 	UPROPERTY(EditAnywhere,blueprintReadOnly,Category = "Weapons")
 	 uint8 reserveAmmo;
@@ -45,7 +46,8 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite ,Category = "Weapons")
 	TObjectPtr<USphereComponent> SphereComponent;
 
-	bool IsPickedUp = false;
+	UPROPERTY()
+	bool IsPickedUp;
 
 	
 	virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, 

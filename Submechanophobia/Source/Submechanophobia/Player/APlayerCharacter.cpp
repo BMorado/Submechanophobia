@@ -74,6 +74,9 @@ void AAPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	}
 }
 
+
+
+
 void AAPlayerCharacter::StartJump()
 {
 	bPressedJump = true;
@@ -142,8 +145,8 @@ FHitResult* AAPlayerCharacter::RayCast()
 	FVector ForwardVector = Camera->GetForwardVector();
 	FVector EndTrace =  (ForwardVector * 5000.f) + StartTrace;
 	FCollisionQueryParams* CQP = new FCollisionQueryParams();
-	
-	if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility, *CQP))
+	CQP->bIgnoreBlocks = false;
+	if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Camera, *CQP))
 	{
 		//PlayAnimMontage(MeleeAttackMontage);
 		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 255), true);
@@ -154,22 +157,26 @@ FHitResult* AAPlayerCharacter::RayCast()
 
 
 
-void AAPlayerCharacter::AddWeapon(AUWeaponBase* weapon)
+void AAPlayerCharacter::AddWeapon( AUWeaponBase* weapon)
 {
-	FVector SpawnLocation = Camera->GetForwardVector() + GetActorLocation();
-	FRotator SpawnRotation = Camera->GetComponentRotation();
-	FActorSpawnParameters SpawnInfo;
+	if (PrimaryWeapon != nullptr)
+	{
+		PrimaryWeapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		PrimaryWeapon->IsPickedUp = false;
+	}
+	FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
 	
-	FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true);
-	weapon->IsPickedUp = true;
 	if (weapon->isPrimary)
 	{
 		PrimaryWeapon = weapon;
 	}
-	else if (!weapon->isPrimary)
+	else if (weapon->isPrimary)
 	{
 		SecondaryWeapon = weapon;
 	}
+	currentWeapon = PrimaryWeapon;
 	PrimaryWeapon->AttachToComponent(GetMesh(),AttachRules);
 }
+
+
 
