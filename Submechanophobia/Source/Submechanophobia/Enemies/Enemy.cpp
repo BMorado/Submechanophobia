@@ -16,7 +16,7 @@ AEnemy::AEnemy()
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
 
 	CapsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
-	CapsuleComponent->SetCollisionResponseToChannel(ECC_Camera,ECR_Ignore);
+	CapsuleComponent->SetCollisionResponseToChannel(ECC_Camera,ECR_Block);
 	CapsuleComponent->SetCanEverAffectNavigation(false);
 	CapsuleComponent->SetSimulatePhysics(false);
 
@@ -27,8 +27,8 @@ AEnemy::AEnemy()
 	CapsuleComponent->BodyInstance.bLockZRotation = true;
 	
 	// Displays the collider in The editor and game
-	CapsuleComponent->SetHiddenInGame(false);
-	CapsuleComponent->SetVisibility(false);
+	CapsuleComponent->SetHiddenInGame(true);
+	CapsuleComponent->SetVisibility(true);
 	CapsuleComponent->ShapeColor = FColor::Green;
 
 	// Setup Health Component

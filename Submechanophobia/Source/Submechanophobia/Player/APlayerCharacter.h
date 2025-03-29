@@ -5,14 +5,13 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
-
 #include "Submechanophobia/Weapons/WeaponBase.h"
 #include "APlayerCharacter.generated.h"
 
 class UInputMappingContext;
 class UInputAction;
 
-UCLASS()
+UCLASS(Blueprintable)
 class SUBMECHANOPHOBIA_API AAPlayerCharacter : public ACharacter 
 {
 	GENERATED_BODY()
@@ -31,12 +30,16 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	UFUNCTION(BlueprintCallable)
+	void AddWeapon( AUWeaponBase* weapon);
 
 
 protected:
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* Camera;
 
+
+	//controls 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	UInputMappingContext* PlayerMappingContext;
 
@@ -50,21 +53,39 @@ protected:
 	UInputAction* MoveAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
-	UInputAction* LookAction;
+	UInputAction* swapToPrimaryAction;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
+	UInputAction* LookAction;
+
+	//Animations
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation");
 	UAnimMontage* MeleeAttackMontage;
 
+
+
+	// Weapons
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "gameplay");
 	AUWeaponBase* currentWeapon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "gameplay");
+	AUWeaponBase* PrimaryWeapon;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "gameplay");
+	AUWeaponBase* SecondaryWeapon; 
+
+	
 	
 	void StartJump();
 	void StopJump();
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-	void FireWeapon(); 
+	void FireWeapon();
+	void SwapWeaponPrimary();
+
+
 	FHitResult* RayCast();
 	
-	UFUNCTION(BlueprintCallable)
-	void AddWeapon(TSubclassOf<AUWeaponBase> weapon); 
+	
+	
 };

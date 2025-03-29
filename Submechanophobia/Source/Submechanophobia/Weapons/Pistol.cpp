@@ -14,7 +14,9 @@ AUPistol::AUPistol()
 
 	accuracy = 1.5f;
 	
-	damage = 1.0f;
+	damage = 15.0f;
+
+	isPrimary = false;
 }
 
 

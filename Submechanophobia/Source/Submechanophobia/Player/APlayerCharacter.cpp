@@ -4,12 +4,12 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "IPropertyTable.h"
+
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "Submechanophobia/Enemies/Enemy.h"
 #include "Submechanophobia/Weapons/WeaponBase.h"
-#include "UniversalObjectLocators/UniversalObjectLocatorUtils.h"
+ 
 
 
 
@@ -70,8 +70,12 @@ void AAPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInput->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::FireWeapon);
 		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Move);
 		EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Look);
+		EnhancedInput->BindAction(swapToPrimaryAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::SwapWeaponPrimary);
 	}
 }
+
+
+
 
 void AAPlayerCharacter::StartJump()
 {
@@ -105,6 +109,7 @@ void AAPlayerCharacter::Look(const FInputActionValue& Value)
 }
 
 
+
 void AAPlayerCharacter::FireWeapon()
 {
 	if (currentWeapon)
@@ -119,6 +124,18 @@ void AAPlayerCharacter::FireWeapon()
 	
 }
 
+void AAPlayerCharacter::SwapWeaponPrimary()
+{
+	if (PrimaryWeapon && currentWeapon != PrimaryWeapon)
+	{
+		currentWeapon->SetHidden(true);
+		currentWeapon =  PrimaryWeapon;
+		currentWeapon->SetHidden(false); 
+	}
+	
+	
+}
+
 
 FHitResult* AAPlayerCharacter::RayCast()
 {
@@ -128,8 +145,8 @@ FHitResult* AAPlayerCharacter::RayCast()
 	FVector ForwardVector = Camera->GetForwardVector();
 	FVector EndTrace =  (ForwardVector * 5000.f) + StartTrace;
 	FCollisionQueryParams* CQP = new FCollisionQueryParams();
-	
-	if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Visibility, *CQP))
+	CQP->bIgnoreBlocks = false;
+	if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Camera, *CQP))
 	{
 		//PlayAnimMontage(MeleeAttackMontage);
 		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 255), true);
@@ -140,19 +157,26 @@ FHitResult* AAPlayerCharacter::RayCast()
 
 
 
-void AAPlayerCharacter::AddWeapon(TSubclassOf<AUWeaponBase> weapon)
+void AAPlayerCharacter::AddWeapon( AUWeaponBase* weapon)
 {
-	FVector SpawnLocation = Camera->GetForwardVector() + GetActorLocation();
-	FRotator SpawnRotation = Camera->GetComponentRotation();
-	FActorSpawnParameters SpawnInfo;
+	if (PrimaryWeapon != nullptr)
+	{
+		PrimaryWeapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		PrimaryWeapon->IsPickedUp = false;
+	}
+	FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
 	
-	AUWeaponBase* NewWeapon = GetWorld()->SpawnActor<AUWeaponBase>(weapon, SpawnLocation, SpawnRotation, SpawnInfo);
-	FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, true);
-	
-	currentWeapon = NewWeapon;
-	
-	NewWeapon->AttachToComponent(GetMesh(), AttachRules);  // Make sure you have a valid socket name like "WeaponSocket"
-	//WeaponSocket
-
+	if (weapon->isPrimary)
+	{
+		PrimaryWeapon = weapon;
+	}
+	else if (weapon->isPrimary)
+	{
+		SecondaryWeapon = weapon;
+	}
+	currentWeapon = PrimaryWeapon;
+	PrimaryWeapon->AttachToComponent(GetMesh(),AttachRules);
 }
+
+
 
