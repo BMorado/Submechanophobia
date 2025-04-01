@@ -4,7 +4,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "Submechanophobia/Enemies/Enemy.h"
@@ -21,12 +21,13 @@ AAPlayerCharacter::AAPlayerCharacter()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Player Camera"));
 	Camera->SetupAttachment(RootComponent);
-	Camera->bUsePawnControlRotation = true;
-	bUseControllerRotationPitch = true;
-	bUseControllerRotationYaw = true;
+	Camera->bUsePawnControlRotation = false;
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
-	
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.0f,500.0f,0.0f);
 	// load our animation montage
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> MeleeAttackMontageObject(
 		TEXT("/Script/Engine.AnimMontage'/Game/TEST/Enemy/Test_Enemy_Stuff/Anims/Shooting_Montage.Shooting_Montage'")
