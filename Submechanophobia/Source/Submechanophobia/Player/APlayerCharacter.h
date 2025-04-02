@@ -35,8 +35,7 @@ public:
 
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly);
-	//UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere)
 	class UCameraComponent* Camera;
 
 
