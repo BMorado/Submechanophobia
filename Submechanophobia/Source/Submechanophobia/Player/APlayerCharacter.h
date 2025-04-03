@@ -54,11 +54,17 @@ protected:
 	UInputAction* MoveAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
-	UInputAction* swapToPrimaryAction;
+	UInputAction* SwapToPrimaryAction;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
+	UInputAction* SwapToSecondaryAction;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	UInputAction* LookAction;
-
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
+	UInputAction* ReloadAction;
+	
 	//Animations
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation");
 	UAnimMontage* MeleeAttackMontage;
@@ -83,6 +89,8 @@ protected:
 	void Look(const FInputActionValue& Value);
 	void FireWeapon();
 	void SwapWeaponPrimary();
+	void SwapWeaponSecondary();
+	void Reload(); 
 
 
 	FHitResult* RayCast();

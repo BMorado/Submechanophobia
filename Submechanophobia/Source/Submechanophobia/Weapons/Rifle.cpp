@@ -17,6 +17,8 @@ ARifle::ARifle()
 	
 	damage = 8.0f;
 	
+	magazineCapacity = 25; 
+	
 	isPrimary = true;
 
 	IsPickedUp = false;
@@ -33,6 +35,7 @@ ARifle::ARifle()
 	SphereComponent->ShapeColor = FColor::Green;
 
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> WeaponMeshAsset(TEXT("/Game/Boss_assets/Scuttling_Husk/scuttling_husk_exp_feb2.scuttling_husk_exp_feb2"));
+
 	if (WeaponMeshAsset.Succeeded())
 	{
 		weaponMesh->SetSkeletalMesh(WeaponMeshAsset.Object);
