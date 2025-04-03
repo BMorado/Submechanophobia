@@ -8,7 +8,7 @@ AScuttlingHusk::AScuttlingHusk()
 	AttackMontageEndDelegate.BindUFunction(this, FName("AttackEnd"));
 	DamagedMontageEndDelegate.BindUFunction(this, FName("DamagedEnd"));
 	
-	HealthComponent->SetMaxHealth(1.0f);
+	HealthComponent->SetMaxHealth(50.0f);
 	HealthComponent->SetHealth(HealthComponent->GetMaxHealth());
 	
 	// Set Max movement speed
@@ -40,6 +40,7 @@ AScuttlingHusk::AScuttlingHusk()
 
 	// Load AI Controller class 
 	UClass* AIContollerClass = LoadClass<AAIController>(nullptr, TEXT("/Game/AI/ScuttlingHuskAI/AIC_ScuttlingHusk.AIC_ScuttlingHusk_C"));
+	
 	if (AIContollerClass != nullptr)
 	{
 		AIControllerClass = AIContollerClass;
@@ -106,11 +107,8 @@ void AScuttlingHusk::PlayAttackAnim()
 float AScuttlingHusk::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
 	class AController* EventInstigator, AActor* DamageCauser)
 {
-	if (HealthComponent->GetCurrentHealth() <= 0.0f)
-	{
-		this->Destroy();
-	}
-	else if (HealthComponent->GetCurrentHealth() >= 0.0f)
+	HealthComponent->TakeDamage(DamageAmount);
+	if (HealthComponent->GetCurrentHealth() >= 0.0f)
 	{
 		if (isDamagable == true)
 		{
@@ -120,7 +118,17 @@ float AScuttlingHusk::TakeDamage(float DamageAmount, struct FDamageEvent const& 
 			MovementComponent->MaxSpeed = 0;
 			isDamagable = false;
 		}
-		HealthComponent->TakeDamage(DamageAmount);
+		
+	}
+	if (HealthComponent->GetCurrentHealth() <= 0.0f)
+	{
+		this->Destroy();
 	}
 	return DamageAmount;
+}
+
+void AScuttlingHusk::GetPatrolRoute(AEnemySpline*& PatrolRoute)
+{
+	IEnemyInter::GetPatrolRoute(PatrolRoute);
+	PatrolRoute = PatrolRoutePath;
 }
