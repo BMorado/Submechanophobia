@@ -16,7 +16,7 @@ AEnemy::AEnemy()
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
 
 	CapsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
-	CapsuleComponent->SetCollisionResponseToChannel(ECC_Camera,ECR_Block);
+	CapsuleComponent->SetCollisionResponseToChannel(ECC_Camera,ECR_Ignore);
 	CapsuleComponent->SetCanEverAffectNavigation(false);
 	CapsuleComponent->SetSimulatePhysics(false);
 
@@ -37,7 +37,7 @@ AEnemy::AEnemy()
 
 	enemyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Enemy Mesh"));
 	enemyMesh->SetCanEverAffectNavigation(false);
-	
+	enemyMesh->SetupAttachment(CapsuleComponent);
 	// Setup movement component 
 	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
 	MovementComponent->UpdatedComponent = CapsuleComponent;
