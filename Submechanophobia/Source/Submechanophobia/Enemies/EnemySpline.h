@@ -37,16 +37,17 @@ public:
 	TObjectPtr<USceneComponent> DefaultSceneRoot;
 
 	/** Please add a variable description */
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category="Default", meta=(ClampMin="-1", ClampMax="1"))
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category="Default")
 	int32 patrolIndex;
 
 	/** Please add a variable description */
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category="Default")
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category="Default", meta=(val="-1", ClampMax="1"))
 	int32 direction;
 
-	UPROPERTY()
+	UPROPERTY(Blueprintable, BlueprintReadWrite)
 	FIncrementPatrolRoute OnIncrementPatrolRoute;
-
-
+	
+	UFUNCTION(BlueprintCallable)
+	void IncrementPatrolRoute();
 
 };

@@ -15,6 +15,7 @@ AEnemySpline::AEnemySpline()
 
 void AEnemySpline::GetSplinePointAsWorldPos(FVector& Location)
 {
+	Location = Spline->GetLocationAtSplinePoint(patrolIndex,ESplineCoordinateSpace::World); 
 }
 
 // Called when the game starts or when spawned
@@ -29,5 +30,18 @@ void AEnemySpline::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AEnemySpline::IncrementPatrolRoute()
+{
+	patrolIndex += direction;
+	if (patrolIndex == (Spline->GetNumberOfSplinePoints() -1 ))
+	{
+		direction = -1;
+	}
+	else if (patrolIndex == 0)
+	{
+		direction = 1;
+	}
 }
 
