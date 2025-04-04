@@ -27,6 +27,8 @@ public:
 	
 	UPROPERTY(EditAnywhere,blueprintReadOnly,Category = "Weapons")
 	 uint8 magazineAmmo;
+	
+	 uint8 magazineCapacity;
 
 	UPROPERTY(EditAnywhere,blueprintReadOnly,Category = "Weapons")
 	float fireRate;
@@ -46,6 +48,9 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite ,Category = "Weapons")
 	TObjectPtr<USphereComponent> SphereComponent;
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite ,Category = "Weapons")
+	UStaticMeshComponent* AltweaponMesh;
+	
 	UPROPERTY()
 	bool IsPickedUp;
 

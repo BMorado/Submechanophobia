@@ -17,20 +17,27 @@ AGuardianLeviathanBoss::AGuardianLeviathanBoss()
     // === Animation montage end delegate setup ===
     MontageEndDelegate.BindUFunction(this, FName("OnMontageEnded"));
 
-    // === Optional AI setup (handled in Blueprint now) ===
-    // AIControllerClass = AGuardianLeviathanAIC::StaticClass();
-    // AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-    // bUseControllerRotationYaw = true;
+    HealthComponent->SetMaxHealth(100.0f);
+    HealthComponent->SetHealth(HealthComponent->GetMaxHealth());
 
-    // === Mesh and AnimBP assignment are now handled in Blueprint ===
+
+    //Mesh and Anim BP assignment should happen in the Blueprint for flexibility.
     
 }
 
 void AGuardianLeviathanBoss::BeginPlay()
 {
     Super::BeginPlay();
-    /*BossAIC = Cast<AGuardianLeviathanAIC>(GetController());*/
-    UE_LOG(LogTemp, Warning, TEXT("Boss has spawned at: %s"), *GetActorLocation().ToString());
+    
+    AAIController* AIController = Cast<AAIController>(GetController());
+    if (AIController)
+    {
+        UBlackboardComponent* BlackboardComp = AIController->GetBlackboardComponent();
+        if (BlackboardComp)
+        {
+            BlackboardComp->SetValueAsInt(FName("CurrentStage"), CurrentStage); // default = 1
+        }
+    }
 }
 
 void AGuardianLeviathanBoss::EnterNextStage()
@@ -40,11 +47,35 @@ void AGuardianLeviathanBoss::EnterNextStage()
 
 void AGuardianLeviathanBoss::FireAttack()
 {
-    if (!FireMontage) return;
+    /*if (!FireMontage) return;
+
+    UAnimInstance* Anim = enemyMesh->GetAnimInstance();
+    if (!Anim) return;
 
     UE_LOG(LogTemp, Log, TEXT("Boss performing Fire Breath"));
-    enemyMesh->GetAnimInstance()->Montage_Play(FireMontage);
-    enemyMesh->GetAnimInstance()->Montage_SetEndDelegate(MontageEndDelegate, FireMontage);
+    Anim->Montage_SetEndDelegate(MontageEndDelegate, FireMontage);
+    Anim->Montage_Play(FireMontage);*/
+    USkeletalMeshComponent* Mesh = FindComponentByClass<USkeletalMeshComponent>();
+    if (!Mesh) return;
+
+    UAnimInstance* Anim = Mesh->GetAnimInstance();
+    if (!Anim || !FireMontage) return;
+
+    Anim->Montage_Play(FireMontage);
+
+    UParticleSystemComponent* FireVFX = FindComponentByClass<UParticleSystemComponent>();
+    FireVFX->Activate(true);
+
+
+    //USED FOR TESTING
+    HealthComponent->TakeDamage(10.0f);
+    float CurrentHealth = HealthComponent->GetCurrentHealth();
+
+    UE_LOG(LogTemp, Warning, TEXT("Boss current health (after self-damage): %.2f"), CurrentHealth);
+
+    OnBossDamaged(CurrentHealth); // Will trigger stage logic if needed
+    //END OF TESTING
+
 
     // Start damage over time
     GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AGuardianLeviathanBoss::ApplyFireDamage, 0.5f, true, 0.0f);
@@ -54,7 +85,10 @@ void AGuardianLeviathanBoss::FireAttack()
 void AGuardianLeviathanBoss::ApplyFireDamage()
 {
     TArray<AActor*> Players;
-    GetOverlappingActors(Players, AAPlayerCharacter::StaticClass());
+    UCapsuleComponent* fireHitbox = FindComponentByClass<UCapsuleComponent>();
+    
+
+    fireHitbox->GetOverlappingActors(Players, AAPlayerCharacter::StaticClass());
 
     for (AActor* Player : Players)
     {
@@ -68,6 +102,8 @@ void AGuardianLeviathanBoss::ApplyFireDamage()
 
 void AGuardianLeviathanBoss::StopFireBreath()
 {
+    UParticleSystemComponent* FireVFX = FindComponentByClass<UParticleSystemComponent>();
+    FireVFX->Deactivate();
     GetWorldTimerManager().ClearTimer(FireTimerHandle);
 }
 
@@ -75,9 +111,12 @@ void AGuardianLeviathanBoss::ScreechAttack()
 {
     if (!ScreechMontage) return;
 
+    UAnimInstance* Anim = enemyMesh->GetAnimInstance();
+    if (!Anim) return;
+
     UE_LOG(LogTemp, Log, TEXT("Boss performing Screech"));
-    enemyMesh->GetAnimInstance()->Montage_Play(ScreechMontage);
-    enemyMesh->GetAnimInstance()->Montage_SetEndDelegate(MontageEndDelegate, ScreechMontage);
+    Anim->Montage_SetEndDelegate(MontageEndDelegate, ScreechMontage);
+    Anim->Montage_Play(ScreechMontage);
 
     // Damage only — stun logic omitted as requested
     TArray<AActor*> Players;
@@ -96,20 +135,33 @@ void AGuardianLeviathanBoss::LungeAttack()
 {
     if (!LungeMontage) return;
 
+    UAnimInstance* Anim = enemyMesh->GetAnimInstance();
+    if (!Anim) return;
+
     UE_LOG(LogTemp, Log, TEXT("Boss performing Lunge"));
-    enemyMesh->GetAnimInstance()->Montage_Play(LungeMontage);
-    enemyMesh->GetAnimInstance()->Montage_SetEndDelegate(MontageEndDelegate, LungeMontage);
+    Anim->Montage_SetEndDelegate(MontageEndDelegate, LungeMontage);
+    Anim->Montage_Play(LungeMontage);
 
     // Movement logic can be expanded later
 }
 
 void AGuardianLeviathanBoss::TransitionOut()
 {
-    if (!TransitionMontage) return;
+    /*if (!TransitionMontage) return;
 
-    UE_LOG(LogTemp, Log, TEXT("Boss transitioning out"));
-    enemyMesh->GetAnimInstance()->Montage_Play(TransitionMontage);
-    enemyMesh->GetAnimInstance()->Montage_SetEndDelegate(MontageEndDelegate, TransitionMontage);
+    UAnimInstance* Anim = enemyMesh->GetAnimInstance();
+    if (!Anim) return;*/
+    USkeletalMeshComponent* Mesh = FindComponentByClass<USkeletalMeshComponent>();
+    if (!Mesh) return;
+
+    UAnimInstance* Anim = Mesh->GetAnimInstance();
+    if (!Anim || !TransitionMontage) return;
+
+    Anim->Montage_Play(TransitionMontage);
+
+    /*UE_LOG(LogTemp, Log, TEXT("Boss transitioning out"));
+    Anim->Montage_SetEndDelegate(MontageEndDelegate, TransitionMontage);
+    Anim->Montage_Play(TransitionMontage);*/
 }
 
 void AGuardianLeviathanBoss::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
@@ -119,53 +171,81 @@ void AGuardianLeviathanBoss::OnMontageEnded(UAnimMontage* Montage, bool bInterru
 
 void AGuardianLeviathanBoss::MoveToNewHole()
 {
-    // List of 6 hardcoded spawn points (world locations)
-    TArray<FVector> HoleLocations = {
-        FVector(1700, 4930, 90),     // Placeholder for Hole 1
-        FVector(1800, 4930, 90),   // Hole 2
-        FVector(1900, 4930, 90),  // Hole 3
-        FVector(1600, 4930, 90),   // Hole 4
-        FVector(1500, 4930, 90),  // Hole 5
-        FVector(1400, 4930, 90)  // Hole 6
-    };
+    if (HoleTransforms.Num() == 0) return;
 
-    // Avoid picking the same spot again
     int32 NewIndexSpot;
     do {
-        NewIndexSpot = FMath::RandRange(0, HoleLocations.Num() - 1);
-    } while (NewIndexSpot == LastHoleIndex && HoleLocations.Num() > 1);
+        NewIndexSpot = FMath::RandRange(0, HoleTransforms.Num() - 1);
+    } while (NewIndexSpot == LastHoleIndex && HoleTransforms.Num() > 1);
 
     LastHoleIndex = NewIndexSpot;
 
-    // Teleport
-    SetActorLocation(HoleLocations[NewIndexSpot]);
+    const FSpawnHole& Target = HoleTransforms[NewIndexSpot];
 
-    UE_LOG(LogTemp, Warning, TEXT("Boss moved to hole %d at %s"), NewIndexSpot, *HoleLocations[NewIndexSpot].ToString());
+    // Move to new location and rotation
+    SetActorLocationAndRotation(Target.Location, Target.Rotation);
 }
 
 void AGuardianLeviathanBoss::OnBossDamaged(float CurrentHealth)
 {
-    /*AController* Controller = GetController();
-    if (Controller)
-    {
-        AAIController* AIController = Cast<AAIController>(Controller);
-        if (AIController && AIController->GetBlackboardComponent())
-        {
-            AIController->GetBlackboardComponent()->SetValueAsInt("CurrentStage", CurrentStage);
-        }
-    }*/
+    /*AAIController* AIController = Cast<AAIController>(GetController());
+    if (!AIController) return;
+
+    UBlackboardComponent* BlackboardComp = AIController->GetBlackboardComponent();
+    if (!BlackboardComp) return;*/
 
 
     if (CurrentStage == 1 && CurrentHealth <= 66.f)
     {
         CurrentStage = 2;
         UE_LOG(LogTemp, Warning, TEXT("Stage 2 started!"));
+
+        // === Spawn second serpent ===
+        if (UWorld* World = GetWorld())
+        {
+            FActorSpawnParameters SpawnParams;
+            SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+            // Pick a new hole that is not the current one
+            int32 SecondIndex = -1;
+            do {
+                SecondIndex = FMath::RandRange(0, HoleTransforms.Num() - 1);
+            } while (SecondIndex == LastHoleIndex && HoleTransforms.Num() > 1);
+
+            const FSpawnHole& SecondHole = HoleTransforms[SecondIndex];
+
+            AGuardianLeviathanBoss* SecondSerpent = World->SpawnActor<AGuardianLeviathanBoss>(
+                GetClass(), // Spawning another of the same class
+                SecondHole.Location,
+                SecondHole.Rotation,
+                SpawnParams
+            );
+
+            if (SecondSerpent)
+            {
+                SecondSerpent->HoleTransforms = this->HoleTransforms; // Give them the same hole list
+                UE_LOG(LogTemp, Warning, TEXT("Second serpent spawned at hole %d"), SecondIndex);
+            }
+        }
+
     }
     else if (CurrentStage == 2 && CurrentHealth <= 33.f)
     {
         CurrentStage = 3;
         UE_LOG(LogTemp, Warning, TEXT("Stage 3 started!"));
     }
+
+    //Update the BB for CurrentStage
+    AAIController* AIController = Cast<AAIController>(GetController());
+    if (AIController)
+    {
+        UBlackboardComponent* BlackboardComp = AIController->GetBlackboardComponent();
+        if (BlackboardComp)
+        {
+            BlackboardComp->SetValueAsInt(FName("CurrentStage"), CurrentStage);
+        }
+    }
+
 }
 
 float AGuardianLeviathanBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
