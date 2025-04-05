@@ -87,6 +87,9 @@ public:
     UFUNCTION(BlueprintCallable)
     void TransitionOut();
 
+    UFUNCTION(BlueprintCallable)
+    void PlayTransitionIn();
+
     // --- Internal Helpers ---
     void ApplyFireDamage();
     void StopFireBreath();

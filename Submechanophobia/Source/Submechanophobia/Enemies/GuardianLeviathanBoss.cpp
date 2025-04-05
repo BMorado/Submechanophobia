@@ -242,9 +242,20 @@ void AGuardianLeviathanBoss::TransitionOut()
 
     Anim->Montage_Play(TransitionMontage);
 
-    /*UE_LOG(LogTemp, Log, TEXT("Boss transitioning out"));
-    Anim->Montage_SetEndDelegate(MontageEndDelegate, TransitionMontage);
-    Anim->Montage_Play(TransitionMontage);*/
+}
+
+void AGuardianLeviathanBoss::PlayTransitionIn()
+{
+    if (!TransitionMontage || !enemyMesh) return;
+
+    UE_LOG(LogTemp, Warning, TEXT("Boss playing Transition IN (reverse)"));
+
+    UAnimInstance* Anim = enemyMesh->GetAnimInstance();
+    if (!Anim) return;
+
+    Anim->Montage_Play(TransitionMontage, 1.0f);
+    Anim->Montage_SetPlayRate(TransitionMontage, -1.0f);
+    Anim->Montage_JumpToSection(FName("Default"), TransitionMontage); // or any known section/end
 }
 
 void AGuardianLeviathanBoss::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
