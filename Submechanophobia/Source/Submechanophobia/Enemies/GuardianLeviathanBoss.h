@@ -45,6 +45,10 @@ public:
     UFUNCTION(BlueprintCallable)
     void EnterNextStage();
 
+    static float SharedHealth;
+    static float MaxSharedHealth;
+    static AGuardianLeviathanBoss* PrimaryBoss; // Used to run stage transitions only
+
     // --- Anim Montages ---
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss|Animation")
     UAnimMontage* FireMontage;
@@ -72,9 +76,11 @@ public:
     UFUNCTION(BlueprintCallable)
     void FireAttack();
 
+    void ApplyScreechDamage();
     UFUNCTION(BlueprintCallable)
     void ScreechAttack();
 
+    void ApplyLungeDamage(); // Called on impact or during animation
     UFUNCTION(BlueprintCallable)
     void LungeAttack();
 
@@ -92,10 +98,25 @@ public:
 
     virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,class AController* EventInstigator, AActor* DamageCauser) override;
 
+    UFUNCTION(BlueprintCallable)
+    void ApplySharedDamage(float Amount);
+
+    UFUNCTION(BlueprintCallable)
+    static float GetSharedHealth();
+
+    // --- Screech Sound ---
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Audio")
+    USoundBase* ScreechSound;
+
+    // Static tracking of occupied holes (shared across all serpents)
+    static TArray<int32> OccupiedHoleIndices;
+
     // --- New Hole Transform Setup ---
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Movement")
     TArray<FSpawnHole> HoleTransforms;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Movement")
     int32 LastHoleIndex = -1;
+
+    int32 FindAvailableHoleIndex();
 };
