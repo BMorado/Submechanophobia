@@ -3,37 +3,40 @@
 
 #include "DrownedCrew.h"
 
+#include "AIController.h"
+
 ADrownedCrew::ADrownedCrew()
 {
 	// Change these when we have the proper model 
-	CapsuleComponent->SetRelativeScale3D(FVector(3.066639f, 3.066639, 2.818257));
-	CapsuleComponent->SetRelativeRotation(FRotator(90.0f, 90.0f, 180.0f));
-	CapsuleComponent->SetRelativeLocation(FVector(14.1915f, 0.0f, 58.972f));
+	CapsuleComponent->SetRelativeScale3D(FVector(1.5f, 1.5f, 2.0f));
+	CapsuleComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
+	CapsuleComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> enemyAsset(TEXT("/Game/TEST/Enemy/Test_Enemy_Stuff/The_Boss.The_Boss"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> enemyAsset(TEXT("/Game/Boss_assets/crewmate1/crewmate1_GEO.crewmate1_GEO"));
 	if (enemyAsset.Succeeded())
 	{
 		// Set the mesh object, scale and location 
 		enemyMesh->SetSkeletalMesh(enemyAsset.Object);
-		enemyMesh->SetWorldScale3D(FVector(0.560529,0.560529,0.417699));
-		enemyMesh->SetWorldRotation(FRotator(0.0f, -90.0f, 0.0f));
-		enemyMesh->SetRelativeLocation(FVector(0.0f, 0.0f, -41.7699f));
-
 		
+		enemyMesh->SetWorldScale3D(FVector(0.6f,0.6f,0.4f));
+		enemyMesh->SetWorldRotation(FRotator(0.0f, 0.0f, 0.0f));
+		enemyMesh->SetRelativeLocation(FVector(0.0f, 15.0f, -50.0f));
 		
-		
-		/*// Enable Physics 
-		enemyMesh->SetSimulatePhysics(true);
-		enemyMesh->SetCollisionProfileName("Pawn");
-
-		// Stops you from being able to flip the Enemy 
-		enemyMesh->BodyInstance.bLockXRotation = true;
-		enemyMesh->BodyInstance.bLockYRotation = true;
-		enemyMesh->BodyInstance.bLockZRotation = true;*/
 	}
 	//SetUp animations 
-	//static ConstructorHelpers::FObjectFinder<UAnimBlueprint> AnimBlueprint(TEXT("/Game/TEST/Enemy/Test_Enemy_Stuff/Anims/Enemy_ABP.Enemy_ABP"));
-	//enemyMesh->AnimClass = AnimBlueprint.Object->GeneratedClass;
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimBlueprint(TEXT("/Game/AI/DrownedCrewAI/Anims/ABP_DrowndedCrew.ABP_DrowndedCrew_C"));
+	if (AnimBlueprint.Succeeded())
+	{
+		enemyMesh->SetAnimInstanceClass(AnimBlueprint.Class);
+	}
+	UClass* AIContollerClass = LoadClass<AAIController>(nullptr, TEXT("/Game/AI/DrownedCrewAI/BP_DrownedCrewAIController.BP_DrownedCrewAIController_C"));
+	
+	if (AIContollerClass != nullptr)
+	{
+		AIControllerClass = AIContollerClass;
+		AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+		bUseControllerRotationYaw = true;
+	}
 }
 
 void ADrownedCrew::BeginPlay()

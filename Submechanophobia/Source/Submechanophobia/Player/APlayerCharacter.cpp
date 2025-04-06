@@ -4,7 +4,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "Submechanophobia/Enemies/Enemy.h"
@@ -21,12 +21,13 @@ AAPlayerCharacter::AAPlayerCharacter()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Player Camera"));
 	Camera->SetupAttachment(RootComponent);
-	Camera->bUsePawnControlRotation = true;
-	bUseControllerRotationPitch = true;
-	bUseControllerRotationYaw = true;
+	Camera->bUsePawnControlRotation = false;
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
-	
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0.0f,500.0f,0.0f);
 	// load our animation montage
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> MeleeAttackMontageObject(
 		TEXT("/Script/Engine.AnimMontage'/Game/TEST/Enemy/Test_Enemy_Stuff/Anims/Shooting_Montage.Shooting_Montage'")
@@ -70,7 +71,10 @@ void AAPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInput->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::FireWeapon);
 		EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Move);
 		EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Look);
-		EnhancedInput->BindAction(swapToPrimaryAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::SwapWeaponPrimary);
+		EnhancedInput->BindAction(SwapToPrimaryAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::SwapWeaponPrimary);
+		EnhancedInput->BindAction(SwapToSecondaryAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::SwapWeaponSecondary);
+		EnhancedInput->BindAction(SwapToSecondaryAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Reload);
+
 	}
 }
 
@@ -128,14 +132,39 @@ void AAPlayerCharacter::SwapWeaponPrimary()
 {
 	if (PrimaryWeapon && currentWeapon != PrimaryWeapon)
 	{
-		currentWeapon->SetHidden(true);
+		if (SecondaryWeapon)
+			SecondaryWeapon->AltweaponMesh->SetVisibility(false);
+		
+		PrimaryWeapon->weaponMesh->SetVisibility(true);
 		currentWeapon =  PrimaryWeapon;
-		currentWeapon->SetHidden(false); 
 	}
 	
 	
 }
 
+void AAPlayerCharacter::SwapWeaponSecondary()
+{
+	if (SecondaryWeapon && currentWeapon != SecondaryWeapon)
+	{
+		if (PrimaryWeapon)
+			PrimaryWeapon->weaponMesh->SetVisibility(false);
+		
+		SecondaryWeapon->AltweaponMesh->SetVisibility(true);
+		currentWeapon =  SecondaryWeapon;
+	}
+	
+}
+
+void AAPlayerCharacter::Reload()
+{
+	if (currentWeapon)
+	{
+		if (currentWeapon->magazineAmmo < currentWeapon->magazineCapacity)
+		{
+			currentWeapon->magazineAmmo += currentWeapon->magazineAmmo - currentWeapon->reserveAmmo;
+		}
+	}
+}
 
 FHitResult* AAPlayerCharacter::RayCast()
 {
@@ -159,23 +188,38 @@ FHitResult* AAPlayerCharacter::RayCast()
 
 void AAPlayerCharacter::AddWeapon( AUWeaponBase* weapon)
 {
-	if (PrimaryWeapon != nullptr)
-	{
-		PrimaryWeapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		PrimaryWeapon->IsPickedUp = false;
-	}
+	
+	
+	
 	FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
 	
 	if (weapon->isPrimary)
 	{
+		if (PrimaryWeapon != nullptr)
+		{
+			PrimaryWeapon->weaponMesh->SetVisibility(true);
+			PrimaryWeapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+			PrimaryWeapon->IsPickedUp = false;
+		}
+		
 		PrimaryWeapon = weapon;
+		PrimaryWeapon->weaponMesh->SetVisibility(false);
 	}
-	else if (weapon->isPrimary)
+	else if (!weapon->isPrimary)
 	{
+		if (SecondaryWeapon != nullptr)
+		{
+			SecondaryWeapon->AltweaponMesh->SetVisibility(true);
+			SecondaryWeapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+			SecondaryWeapon->IsPickedUp = false;
+		}
+		
 		SecondaryWeapon = weapon;
+		SecondaryWeapon->AltweaponMesh->SetVisibility(false);
+		
 	}
-	currentWeapon = PrimaryWeapon;
-	PrimaryWeapon->AttachToComponent(GetMesh(),AttachRules);
+	
+	weapon->AttachToComponent(GetMesh(),AttachRules,TEXT("WeaponSocket"));
 }
 
 
