@@ -10,6 +10,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GuardianLeviathanBoss.generated.h"
 
+class UNiagaraComponent;
 
 USTRUCT(BlueprintType)
 struct SUBMECHANOPHOBIA_API FSpawnHole
@@ -48,6 +49,9 @@ public:
     static float SharedHealth;
     static float MaxSharedHealth;
     static AGuardianLeviathanBoss* PrimaryBoss; // Used to run stage transitions only
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss")
+    bool bIsPrimaryBoss = false;
 
     // --- Anim Montages ---
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss|Animation")
@@ -122,4 +126,11 @@ public:
     int32 LastHoleIndex = -1;
 
     int32 FindAvailableHoleIndex();
+
+    UPROPERTY()
+    UNiagaraComponent* FlameEffect1;
+
+    UPROPERTY()
+    UNiagaraComponent* FlameEffect2;
+
 };

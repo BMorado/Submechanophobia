@@ -3,10 +3,14 @@
 
 #include "GuardianLeviathanBoss.h"
 #include "Submechanophobia/Player/APlayerCharacter.h"
+#include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
 #include "AIController.h"
 #include "BrainComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 
 //static variables
 float AGuardianLeviathanBoss::SharedHealth = 100.f;
@@ -34,6 +38,12 @@ AGuardianLeviathanBoss::AGuardianLeviathanBoss()
 void AGuardianLeviathanBoss::BeginPlay()
 {
     Super::BeginPlay();
+    
+    // Ensure clean state on play start
+    if (!bIsPrimaryBoss)
+    {
+        PrimaryBoss = nullptr;
+    }
 
     if (!PrimaryBoss)
     {
@@ -48,6 +58,21 @@ void AGuardianLeviathanBoss::BeginPlay()
         if (BlackboardComp)
         {
             BlackboardComp->SetValueAsInt(FName("CurrentStage"), CurrentStage); // default = 1, after should follow what is set (when second serpent is created CurrentStage = 2)
+        }
+    }
+
+    TArray<UNiagaraComponent*> NiagaraComponents;
+    GetComponents<UNiagaraComponent>(NiagaraComponents);
+
+    for (UNiagaraComponent* NiagaraComp : NiagaraComponents)
+    {
+        if (NiagaraComp->GetName().Contains("FlameVFX1"))
+        {
+            FlameEffect1 = NiagaraComp;
+        }
+        else if (NiagaraComp->GetName().Contains("FlameVFX2"))
+        {
+            FlameEffect2 = NiagaraComp;
         }
     }
 }
@@ -68,9 +93,8 @@ void AGuardianLeviathanBoss::FireAttack()
 
     Anim->Montage_Play(FireMontage);
 
-    UParticleSystemComponent* FireVFX = FindComponentByClass<UParticleSystemComponent>();
-    FireVFX->Activate(true);
-
+    if (FlameEffect1) FlameEffect1->Activate();
+    if (FlameEffect2) FlameEffect2->Activate();
 
     //USED FOR TESTING
     ApplySharedDamage(10.f);
@@ -110,8 +134,9 @@ void AGuardianLeviathanBoss::ApplyFireDamage()
 
 void AGuardianLeviathanBoss::StopFireBreath()
 {
-    UParticleSystemComponent* FireVFX = FindComponentByClass<UParticleSystemComponent>();
-    FireVFX->Deactivate();
+    if (FlameEffect1) FlameEffect1->Deactivate();
+    if (FlameEffect2) FlameEffect2->Deactivate();
+
     GetWorldTimerManager().ClearTimer(FireTimerHandle);
 }
 
@@ -409,12 +434,23 @@ float AGuardianLeviathanBoss::TakeDamage(float DamageAmount, FDamageEvent const&
 
 void AGuardianLeviathanBoss::ApplySharedDamage(float Amount)
 {
+    if (!IsValid(this) || this->IsActorBeingDestroyed())
+    {
+        UE_LOG(LogTemp, Error, TEXT("This serpent is invalid or pending kill!"));
+        return;
+    }
+
+    if (!IsValid(PrimaryBoss))
+    {
+        UE_LOG(LogTemp, Error, TEXT("ApplySharedDamage: PrimaryBoss is invalid or destroyed!"));
+        return;
+    }
+
     SharedHealth -= Amount;
     SharedHealth = FMath::Clamp(SharedHealth, 0.f, MaxSharedHealth);
 
     UE_LOG(LogTemp, Warning, TEXT("[Shared Damage] Applied %.2f — Current: %.2f"), Amount, SharedHealth);
 
-    if (!PrimaryBoss) return;
     UWorld* World = PrimaryBoss->GetWorld();
 
     if (SharedHealth <= 0.f)
@@ -445,6 +481,8 @@ void AGuardianLeviathanBoss::ApplySharedDamage(float Amount)
 
                // Destroy the serpent
                SerpentBoss->Destroy();
+
+               PrimaryBoss = nullptr;
            }
        }
 
