@@ -3,10 +3,12 @@
 
 #include "DrownedCrew.h"
 
+#include "AIController.h"
+
 ADrownedCrew::ADrownedCrew()
 {
 	// Change these when we have the proper model 
-	CapsuleComponent->SetRelativeScale3D(FVector(1.0f, 1.0f, 1.0f));
+	CapsuleComponent->SetRelativeScale3D(FVector(1.5f, 1.5f, 2.0f));
 	CapsuleComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
 	CapsuleComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 
@@ -16,9 +18,9 @@ ADrownedCrew::ADrownedCrew()
 		// Set the mesh object, scale and location 
 		enemyMesh->SetSkeletalMesh(enemyAsset.Object);
 		
-		enemyMesh->SetWorldScale3D(FVector(1.0f,1.0f,1.0f));
+		enemyMesh->SetWorldScale3D(FVector(0.6f,0.6f,0.4f));
 		enemyMesh->SetWorldRotation(FRotator(0.0f, 0.0f, 0.0f));
-		enemyMesh->SetRelativeLocation(FVector(1.0f, 1.0f, 1.0f));
+		enemyMesh->SetRelativeLocation(FVector(0.0f, 15.0f, -50.0f));
 		
 	}
 	//SetUp animations 
@@ -27,7 +29,14 @@ ADrownedCrew::ADrownedCrew()
 	{
 		enemyMesh->SetAnimInstanceClass(AnimBlueprint.Class);
 	}
+	UClass* AIContollerClass = LoadClass<AAIController>(nullptr, TEXT("/Game/AI/DrownedCrewAI/BP_DrownedCrewAIController.BP_DrownedCrewAIController_C"));
 	
+	if (AIContollerClass != nullptr)
+	{
+		AIControllerClass = AIContollerClass;
+		AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+		bUseControllerRotationYaw = true;
+	}
 }
 
 void ADrownedCrew::BeginPlay()
