@@ -4,7 +4,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "AssetTypeActions/AssetDefinition_SoundBase.h"
+
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"

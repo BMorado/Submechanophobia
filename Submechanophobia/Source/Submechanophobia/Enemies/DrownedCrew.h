@@ -18,6 +18,22 @@ class SUBMECHANOPHOBIA_API ADrownedCrew : public AEnemy
 	virtual void Tick(float DeltaTime) override;
 	
 	virtual void Attack() override;
+	virtual void PlayAttackAnim() override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+	UFUNCTION()
+	void AttackEnd();
+	UFUNCTION()
+	void DamagedEnd();
+	
+	FOnMontageEnded AttackMontageEndDelegate;
+	FOnMontageEnded DamagedMontageEndDelegate;
+
+	UPROPERTY(VisibleAnywhere,Category = "Animation")
+	TObjectPtr<UAnimMontage> attackMontage;
+
+	UPROPERTY(VisibleAnywhere,Category = "Animation")
+	TObjectPtr<UAnimMontage> damagedMontage;
 	
 	uint8 damage = 10;
 };
