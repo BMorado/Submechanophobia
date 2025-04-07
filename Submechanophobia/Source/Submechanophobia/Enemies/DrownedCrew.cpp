@@ -12,6 +12,8 @@ ADrownedCrew::ADrownedCrew()
 	CapsuleComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
 	CapsuleComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 
+	MovementComponent->MaxSpeed = 400;
+	
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> enemyAsset(TEXT("/Game/Boss_assets/crewmate1/crewmate1_GEO.crewmate1_GEO"));
 	if (enemyAsset.Succeeded())
 	{
