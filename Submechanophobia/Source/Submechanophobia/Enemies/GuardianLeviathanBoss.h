@@ -66,6 +66,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss|Animation")
     UAnimMontage* TransitionMontage;
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Boss|Hitboxes")
+    UCapsuleComponent* FireDamageHitbox;
+  
     // --- Animation Events ---
     FOnMontageEnded MontageEndDelegate;
 
@@ -132,5 +135,8 @@ public:
 
     UPROPERTY()
     UNiagaraComponent* FlameEffect2;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|UI")
+    TSubclassOf<class UUserWidget> WinWidgetClass;
 
 };

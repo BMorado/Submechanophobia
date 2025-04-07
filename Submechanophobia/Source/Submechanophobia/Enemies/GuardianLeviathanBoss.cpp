@@ -1,13 +1,15 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "GuardianLeviathanBoss.h"
 #include "Submechanophobia/Player/APlayerCharacter.h"
+#include "GameFramework/PlayerController.h"
 #include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
 #include "AIController.h"
 #include "BrainComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
@@ -30,9 +32,13 @@ AGuardianLeviathanBoss::AGuardianLeviathanBoss()
     HealthComponent->SetMaxHealth(100.0f);
     HealthComponent->SetHealth(HealthComponent->GetMaxHealth());
 
-
+   
     //Mesh and Anim BP assignment should happen in the Blueprint for flexibility.
-    
+    FireDamageHitbox = CreateDefaultSubobject<UCapsuleComponent>(TEXT("FireDamageHitbox"));
+    FireDamageHitbox->SetupAttachment(RootComponent);
+    FireDamageHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    FireDamageHitbox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+    FireDamageHitbox->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);
 }
 
 void AGuardianLeviathanBoss::BeginPlay()
@@ -75,6 +81,8 @@ void AGuardianLeviathanBoss::BeginPlay()
             FlameEffect2 = NiagaraComp;
         }
     }
+
+ 
 }
 
 void AGuardianLeviathanBoss::EnterNextStage()
@@ -96,6 +104,8 @@ void AGuardianLeviathanBoss::FireAttack()
     if (FlameEffect1) FlameEffect1->Activate();
     if (FlameEffect2) FlameEffect2->Activate();
 
+    
+
     //USED FOR TESTING
     ApplySharedDamage(10.f);
 
@@ -108,6 +118,10 @@ void AGuardianLeviathanBoss::FireAttack()
     UE_LOG(LogTemp, Warning, TEXT("Boss current shared health: %.2f"), GetSharedHealth());
     // === END TEST ===
 
+    if (FireDamageHitbox)
+    {
+        FireDamageHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    }
 
     // Start damage over time
     GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AGuardianLeviathanBoss::ApplyFireDamage, 0.5f, true, 0.0f);
@@ -116,15 +130,17 @@ void AGuardianLeviathanBoss::FireAttack()
 
 void AGuardianLeviathanBoss::ApplyFireDamage()
 {
-    TArray<AActor*> Players;
-    UCapsuleComponent* fireHitbox = FindComponentByClass<UCapsuleComponent>();
-    
+    if (!FireDamageHitbox)
+    {
+        UE_LOG(LogTemp, Error, TEXT("FireDamageHitbox is null!"));
+        return;
+    }
 
-    fireHitbox->GetOverlappingActors(Players, AAPlayerCharacter::StaticClass());
+    TArray<AActor*> Players;
+    FireDamageHitbox->GetOverlappingActors(Players, AAPlayerCharacter::StaticClass());
 
     for (AActor* Player : Players)
     {
-        // Apply damage
         if (AAPlayerCharacter* Target = Cast<AAPlayerCharacter>(Player))
         {
             UGameplayStatics::ApplyDamage(Target, 10.0f, GetController(), this, nullptr);
@@ -136,6 +152,8 @@ void AGuardianLeviathanBoss::StopFireBreath()
 {
     if (FlameEffect1) FlameEffect1->Deactivate();
     if (FlameEffect2) FlameEffect2->Deactivate();
+
+    FireDamageHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
     GetWorldTimerManager().ClearTimer(FireTimerHandle);
 }
@@ -172,7 +190,7 @@ void AGuardianLeviathanBoss::ScreechAttack()
     Anim->Montage_SetEndDelegate(MontageEndDelegate, ScreechMontage);
     Anim->Montage_Play(ScreechMontage);
 
-    // Damage only � stun logic omitted as requested
+    // Damage only — stun logic omitted per now
     TArray<AActor*> Players;
     GetOverlappingActors(Players, AAPlayerCharacter::StaticClass());
 
@@ -449,13 +467,13 @@ void AGuardianLeviathanBoss::ApplySharedDamage(float Amount)
     SharedHealth -= Amount;
     SharedHealth = FMath::Clamp(SharedHealth, 0.f, MaxSharedHealth);
 
-    UE_LOG(LogTemp, Warning, TEXT("[Shared Damage] Applied %.2f � Current: %.2f"), Amount, SharedHealth);
+    UE_LOG(LogTemp, Warning, TEXT("[Shared Damage] Applied %.2f — Current: %.2f"), Amount, SharedHealth);
 
     UWorld* World = PrimaryBoss->GetWorld();
 
     if (SharedHealth <= 0.f)
     {
-       UE_LOG(LogTemp, Warning, TEXT("Boss defeated � shared health depleted."));
+       UE_LOG(LogTemp, Warning, TEXT("Boss defeated — shared health depleted."));
 
       // Clean up all serpents
        TArray<AActor*> FoundSerpents;
@@ -487,6 +505,26 @@ void AGuardianLeviathanBoss::ApplySharedDamage(float Amount)
        }
 
        OccupiedHoleIndices.Empty(); // Clear tracking list
+
+       // 👇 Add Win Widget and disable player control
+       APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+       if (PC)
+       {
+           PC->SetIgnoreMoveInput(true);
+           PC->SetIgnoreLookInput(true);
+           PC->bShowMouseCursor = true;
+           PC->SetInputMode(FInputModeUIOnly());
+
+           if (WinWidgetClass) // ← UPROPERTY for the Widget
+           {
+               UUserWidget* WinWidget = CreateWidget<UUserWidget>(PC, WinWidgetClass);
+               if (WinWidget)
+               {
+                   WinWidget->AddToViewport();
+               }
+           }
+       }
+
     }
     if (PrimaryBoss)
     {
