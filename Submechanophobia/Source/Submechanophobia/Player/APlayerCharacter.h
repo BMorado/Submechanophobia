@@ -69,7 +69,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation");
 	UAnimMontage* MeleeAttackMontage;
 
-
+	FTimerHandle UnusedHandle;
 
 	// Weapons
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "gameplay");
@@ -81,19 +81,23 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "gameplay");
 	AUWeaponBase* SecondaryWeapon; 
 
+	FHitResult* HitResult;
+
+	bool canShoot = true; 
 	
 	
 	void StartJump();
 	void StopJump();
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	
 	void FireWeapon();
 	void SwapWeaponPrimary();
 	void SwapWeaponSecondary();
 	void Reload(); 
+	void WeaponFireDelay(); 
 
-
-	FHitResult* RayCast();
+	void RayCast();
 	
 	
 	

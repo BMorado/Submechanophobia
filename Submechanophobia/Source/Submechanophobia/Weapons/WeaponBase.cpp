@@ -12,7 +12,8 @@ AUWeaponBase::AUWeaponBase()
 	SphereComponent->SetVisibility(false);
 	SphereComponent->ShapeColor = FColor::Green;
 
-	weaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Enemy Mesh"));
+	weaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Weapon Mesh")); 
+
 }
 
 

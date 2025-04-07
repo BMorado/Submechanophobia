@@ -4,6 +4,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "AssetTypeActions/AssetDefinition_SoundBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
@@ -37,6 +38,7 @@ AAPlayerCharacter::AAPlayerCharacter()
 	{
 		MeleeAttackMontage = MeleeAttackMontageObject.Object;
 	}
+	HitResult = new FHitResult(0); 
 }
 
 // Called when the game starts or when spawned
@@ -73,8 +75,7 @@ void AAPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Look);
 		EnhancedInput->BindAction(SwapToPrimaryAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::SwapWeaponPrimary);
 		EnhancedInput->BindAction(SwapToSecondaryAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::SwapWeaponSecondary);
-		EnhancedInput->BindAction(SwapToSecondaryAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Reload);
-
+		EnhancedInput->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Reload);
 	}
 }
 
@@ -102,7 +103,10 @@ void AAPlayerCharacter::Move(const FInputActionValue& Value)
 
 	const FVector RightDirecton = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 	AddMovementInput(RightDirecton, DirectionValue.X);
+
+	
 }
+
 
 void AAPlayerCharacter::Look(const FInputActionValue& Value)
 {
@@ -116,24 +120,28 @@ void AAPlayerCharacter::Look(const FInputActionValue& Value)
 
 void AAPlayerCharacter::FireWeapon()
 {
-	if (currentWeapon)
+	if (currentWeapon != nullptr && currentWeapon->magazineAmmo > 0 && canShoot)
 	{
-		if (currentWeapon->magazineAmmo > 0 )
-		{
-			FHitResult* HitResult = RayCast();
-			currentWeapon->magazineAmmo--;
-			UGameplayStatics::ApplyDamage(HitResult->GetActor(),currentWeapon->damage,nullptr,this,nullptr); 
-		}
+		RayCast(); 
+		currentWeapon->magazineAmmo--;
+		UGameplayStatics::ApplyDamage(HitResult->GetActor(),currentWeapon->damage,nullptr,this,nullptr);
+		GetWorld()->GetTimerManager().SetTimer(UnusedHandle,this,&AAPlayerCharacter::WeaponFireDelay,currentWeapon->fireRate,false); 
 	}
 	
 }
 
+
+void AAPlayerCharacter::WeaponFireDelay()
+{
+	canShoot = true ; 
+}
+//hides secondary weapon, makes primary weapon visible then sets primary to current weapon
 void AAPlayerCharacter::SwapWeaponPrimary()
 {
 	if (PrimaryWeapon && currentWeapon != PrimaryWeapon)
 	{
 		if (SecondaryWeapon)
-			SecondaryWeapon->AltweaponMesh->SetVisibility(false);
+			SecondaryWeapon->weaponMesh->SetVisibility(false);
 		
 		PrimaryWeapon->weaponMesh->SetVisibility(true);
 		currentWeapon =  PrimaryWeapon;
@@ -142,6 +150,7 @@ void AAPlayerCharacter::SwapWeaponPrimary()
 	
 }
 
+//hides primary weapon, makes secondary weapon visible then sets secondary to current weapon
 void AAPlayerCharacter::SwapWeaponSecondary()
 {
 	if (SecondaryWeapon && currentWeapon != SecondaryWeapon)
@@ -149,7 +158,7 @@ void AAPlayerCharacter::SwapWeaponSecondary()
 		if (PrimaryWeapon)
 			PrimaryWeapon->weaponMesh->SetVisibility(false);
 		
-		SecondaryWeapon->AltweaponMesh->SetVisibility(true);
+		SecondaryWeapon->weaponMesh->SetVisibility(true);
 		currentWeapon =  SecondaryWeapon;
 	}
 	
@@ -157,31 +166,47 @@ void AAPlayerCharacter::SwapWeaponSecondary()
 
 void AAPlayerCharacter::Reload()
 {
+	// Check if pointer isn't null and that we have a weapon
 	if (currentWeapon)
 	{
-		if (currentWeapon->magazineAmmo < currentWeapon->magazineCapacity)
+		UE_LOG(LogTemp, Warning, TEXT("Current Mag  Pre-Reload: %u"),currentWeapon->magazineAmmo);
+		
+		// See if the number of "bullets" is below capacity
+		if (currentWeapon->magazineAmmo < currentWeapon->magazineCapacity && currentWeapon->reserveAmmo != 0)
 		{
-			currentWeapon->magazineAmmo += currentWeapon->magazineAmmo - currentWeapon->reserveAmmo;
+			uint8 ReloadCalculation = (currentWeapon->reserveAmmo >= currentWeapon->magazineCapacity) ? (currentWeapon->magazineAmmo - currentWeapon->magazineCapacity) * -1 : currentWeapon->reserveAmmo;
+			
+			currentWeapon->magazineAmmo += ReloadCalculation;
+			
+			currentWeapon->reserveAmmo -= ReloadCalculation;
 		}
 	}
-}
+	UE_LOG(LogTemp, Warning, TEXT("Current Mag  Post-Reload: %u"),currentWeapon->magazineAmmo);
 
-FHitResult* AAPlayerCharacter::RayCast()
-{
+}
 	
-	FHitResult* HitResult = new FHitResult();
+
+
+
+void  AAPlayerCharacter::RayCast()
+{
+	canShoot = false;
+	
 	FVector StartTrace = Camera->GetComponentLocation();
 	FVector ForwardVector = Camera->GetForwardVector();
-	FVector EndTrace =  (ForwardVector * 5000.f) + StartTrace;
+	FVector offset = FMath::VRand() * 2.0f;
+	 
+	FVector EndTrace = (currentWeapon->bulletSpread + ForwardVector * 5000.f) + StartTrace;
+	
 	FCollisionQueryParams* CQP = new FCollisionQueryParams();
 	CQP->bIgnoreBlocks = false;
 	if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Camera, *CQP))
 	{
 		//PlayAnimMontage(MeleeAttackMontage);
 		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 255), true);
-		return HitResult; 
+		
 	}
-	return  HitResult;
+	
 }
 
 
@@ -192,34 +217,45 @@ void AAPlayerCharacter::AddWeapon( AUWeaponBase* weapon)
 	
 	
 	FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
-	
+	//checks if the weapon being added is a Primary weapon
 	if (weapon->isPrimary)
 	{
+		//see if we've already got a primary weapon
 		if (PrimaryWeapon != nullptr)
 		{
+			//sets that weapon visible | Remove previous primary from player | Set flag false
+			
 			PrimaryWeapon->weaponMesh->SetVisibility(true);
 			PrimaryWeapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 			PrimaryWeapon->IsPickedUp = false;
 		}
-		
+
+		//new weapon is now set as primary and is hidden until player equips
 		PrimaryWeapon = weapon;
 		PrimaryWeapon->weaponMesh->SetVisibility(false);
+		PrimaryWeapon->weaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		weapon->AttachToComponent(GetMesh(),AttachRules,TEXT("WeaponSocket_Primary"));
+
 	}
+	// same protocol as primary weapon performed for secondary type weapons
 	else if (!weapon->isPrimary)
 	{
 		if (SecondaryWeapon != nullptr)
 		{
-			SecondaryWeapon->AltweaponMesh->SetVisibility(true);
+			SecondaryWeapon->weaponMesh->SetVisibility(true);
 			SecondaryWeapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 			SecondaryWeapon->IsPickedUp = false;
 		}
 		
 		SecondaryWeapon = weapon;
-		SecondaryWeapon->AltweaponMesh->SetVisibility(false);
+		SecondaryWeapon->weaponMesh->SetVisibility(false);
+		SecondaryWeapon->weaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		weapon->AttachToComponent(GetMesh(),AttachRules,TEXT("WeaponSocket_Secondary"));
+
 		
 	}
-	
-	weapon->AttachToComponent(GetMesh(),AttachRules,TEXT("WeaponSocket"));
+
+	//attach weapon actor to player mesh socket 
 }
 
 

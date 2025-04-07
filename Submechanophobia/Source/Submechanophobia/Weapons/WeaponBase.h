@@ -34,22 +34,19 @@ public:
 	float fireRate;
 
 	UPROPERTY(EditAnywhere,blueprintReadOnly,Category = "Weapons")
-	float accuracy; 
+	FVector bulletSpread; 
 	
 	UPROPERTY(EditAnywhere,blueprintReadOnly,Category = "Weapons")
 	float damage;
 	
 	UPROPERTY(EditAnywhere,blueprintReadOnly,Category = "Weapons")
 	bool isPrimary;
-	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite ,Category = "Weapons")
-	TObjectPtr<USkeletalMeshComponent> weaponMesh;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite ,Category = "Weapons")
 	TObjectPtr<USphereComponent> SphereComponent;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite ,Category = "Weapons")
-	UStaticMeshComponent* AltweaponMesh;
+	UStaticMeshComponent* weaponMesh;
 	
 	UPROPERTY()
 	bool IsPickedUp;

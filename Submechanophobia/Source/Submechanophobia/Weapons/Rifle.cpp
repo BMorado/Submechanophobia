@@ -13,7 +13,7 @@ ARifle::ARifle()
 	
 	fireRate = 1.0f;
 	
-	accuracy = 1.0f;
+	bulletSpread = FVector(FMath::RandRange(-50.0f, 50.0f),FMath::RandRange(-50.0f, 50.0f),FMath::RandRange(-50.0f, 50.0f));
 	
 	damage = 8.0f;
 	
@@ -34,14 +34,14 @@ ARifle::ARifle()
 	
 	SphereComponent->ShapeColor = FColor::Green;
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> WeaponMeshAsset(TEXT("/Game/Boss_assets/Scuttling_Husk/scuttling_husk_exp_feb2.scuttling_husk_exp_feb2"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> WeaponMeshAsset(TEXT("/Game/Player/Weapons/railgun.railgun"));
 
 	if (WeaponMeshAsset.Succeeded())
 	{
-		weaponMesh->SetSkeletalMesh(WeaponMeshAsset.Object);
+		weaponMesh->SetStaticMesh(WeaponMeshAsset.Object);
 		weaponMesh->SetupAttachment(SphereComponent);
-		weaponMesh->SetWorldScale3D(FVector(9.0));
-		weaponMesh->SetRelativeRotation(FRotator(-90.0, -90.0f, 0.0f));
+		weaponMesh->SetWorldScale3D(FVector(1.0));
+		weaponMesh->SetRelativeRotation(FRotator(0.0, 0.0f, 0.0f));
 		weaponMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
 	}
 	

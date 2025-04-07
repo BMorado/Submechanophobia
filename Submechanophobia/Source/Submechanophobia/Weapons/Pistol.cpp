@@ -10,9 +10,9 @@ AUPistol::AUPistol()
 
 	magazineAmmo = 5;
 
-	fireRate = 0.5f;
+	fireRate = 0.05f;
 
-	accuracy = 1.5f;
+	bulletSpread = FVector(FMath::RandRange(-150.0f, 150.0f),FMath::RandRange(-150.0f, 150.0f),FMath::RandRange(-150.0f, 150.0f));
 	
 	damage = 15.0f;
 
@@ -30,17 +30,17 @@ AUPistol::AUPistol()
 
 	SphereComponent->ShapeColor = FColor::Green;
 	//UStaticMesh*  AltweaponMeshAsset  = LoadObject<UStaticMesh>(nullptr, TEXT("/Game/Player/SM_Weapons/railgun.railgun"));
-	AltweaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> WeaponMeshAsset(TEXT("/Game/Player/SM_Weapons/SM_PISTOL_V1_SA.SM_PISTOL_V1_SA")); 
+	
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> WeaponMeshAsset(TEXT("/Game/Player/Weapons/SM_PISTOL_V1_SA.SM_PISTOL_V1_SA")); 
 	
 	if (WeaponMeshAsset.Succeeded())
 	{
-		AltweaponMesh->SetStaticMesh(WeaponMeshAsset.Object);
-		AltweaponMesh->SetupAttachment(SphereComponent);
-		AltweaponMesh->SetWorldScale3D(FVector(1.0));
-		AltweaponMesh->SetRelativeRotation(FRotator(0.0, 0.0f, 0.0f));
-		AltweaponMesh->SetRelativeLocation(FVector(23.0f, -10.0f, 0.0f));
+		weaponMesh->SetStaticMesh(WeaponMeshAsset.Object);
+		weaponMesh->SetupAttachment(SphereComponent);
+		weaponMesh->SetWorldScale3D(FVector(1.0));
+		weaponMesh->SetRelativeRotation(FRotator(0.0, 0.0f, 0.0f));
+		weaponMesh->SetRelativeLocation(FVector(23.0f, -10.0f, 0.0f));
 	}
 }
 
