@@ -34,7 +34,7 @@ private:
 	UFUNCTION()
 	void DamagedEnd();
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Blueprintable,EditAnywhere)
 	AEnemySpline* PatrolRoutePath;
 	virtual void Attack() override;
 	virtual void PlayAttackAnim() override;

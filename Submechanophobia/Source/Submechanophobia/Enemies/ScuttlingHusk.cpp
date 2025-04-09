@@ -106,12 +106,12 @@ void AScuttlingHusk::Attack()
 void AScuttlingHusk::PlayAttackAnim()
 {
 	Super::PlayAttackAnim();
-	if (UAnimInstance* AnimInstance = enemyMesh->GetAnimInstance())
+	/*if (UAnimInstance* AnimInstance = enemyMesh->GetAnimInstance())
 	{
 		AnimInstance->Montage_Play(attackMontage);
 		GetWorld()->GetTimerManager().SetTimer(timer,this,&AScuttlingHusk::Attack,0.05f,true);
 		AnimInstance->Montage_SetEndDelegate(AttackMontageEndDelegate, attackMontage);
-	}
+	}*/
 }
 
 /*float AScuttlingHusk::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,

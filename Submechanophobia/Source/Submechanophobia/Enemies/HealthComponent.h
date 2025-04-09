@@ -18,7 +18,9 @@ private:
 public:	
 	// Sets default values for this component's properties
 	UHealthComponent();
+	UFUNCTION(BlueprintCallable)
 	void SetMaxHealth(float MaxHealth_);
+	UFUNCTION(BlueprintCallable)
 	float GetCurrentHealth() const;
 	float GetMaxHealth() const;
 	void TakeDamage(float damage_);
