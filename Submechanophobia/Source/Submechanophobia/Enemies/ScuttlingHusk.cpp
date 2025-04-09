@@ -83,7 +83,7 @@ void AScuttlingHusk::Attack()
 	FVector end = enemyMesh->GetSocketLocation("RFH_Attack_Socket");
 	
 	TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add(GetOwner());
+	ActorsToIgnore.Add(this);
 	FHitResult hits;
 	UKismetSystemLibrary::SphereTraceSingle(
 		GetWorld(),start,end,30.0f,UEngineTypes::ConvertToTraceType(ECC_Camera)
