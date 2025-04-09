@@ -149,7 +149,7 @@ public:
     UFUNCTION()
     void OnRep_SharedHealth();
     
-    UPROPERTY(ReplicatedUsing = OnRep_PlayFireVFX)
+    /*UPROPERTY(ReplicatedUsing = OnRep_PlayFireVFX)
     bool bShouldPlayFireVFX = false;
 
     UFUNCTION()
@@ -159,6 +159,6 @@ public:
     bool bShouldStopFireVFX = false;
 
     UFUNCTION()
-    void OnRep_StopFireVFX();
+    void OnRep_StopFireVFX();*/
 
 };
