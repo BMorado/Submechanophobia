@@ -35,11 +35,10 @@ public:
 
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly); 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite); 
 	//UPROPERTY(EditAnywhere)
 	class UCameraComponent* Camera;
-
-
+	
 	//controls 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input");
 	UInputMappingContext* PlayerMappingContext;

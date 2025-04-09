@@ -21,13 +21,17 @@ AAPlayerCharacter::AAPlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Player Camera"));
-	Camera->SetupAttachment(RootComponent);
-	Camera->bUsePawnControlRotation = false;
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
+	Camera->SetupAttachment(GetMesh(), TEXT("HeadCameraSocket")); // or TEXT("head")
+	Camera->bUsePawnControlRotation = true;
+
+	Camera->SetRelativeLocation(FVector::ZeroVector);
+	Camera->SetRelativeRotation(FRotator::ZeroRotator);
+	
+	bUseControllerRotationYaw = true;
+	bUseControllerRotationPitch = true;
 	bUseControllerRotationRoll = false;
 
-	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f,500.0f,0.0f);
 	// load our animation montage
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> MeleeAttackMontageObject(
@@ -60,7 +64,7 @@ void AAPlayerCharacter::BeginPlay()
 void AAPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
 }
 
 // Called to bind functionality to input
