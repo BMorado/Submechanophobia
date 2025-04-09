@@ -106,15 +106,15 @@ void AScuttlingHusk::Attack()
 void AScuttlingHusk::PlayAttackAnim()
 {
 	Super::PlayAttackAnim();
-	/*if (UAnimInstance* AnimInstance = enemyMesh->GetAnimInstance())
+	if (UAnimInstance* AnimInstance = enemyMesh->GetAnimInstance())
 	{
 		AnimInstance->Montage_Play(attackMontage);
 		GetWorld()->GetTimerManager().SetTimer(timer,this,&AScuttlingHusk::Attack,0.05f,true);
 		AnimInstance->Montage_SetEndDelegate(AttackMontageEndDelegate, attackMontage);
-	}*/
+	}
 }
 
-/*float AScuttlingHusk::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+float AScuttlingHusk::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
 	class AController* EventInstigator, AActor* DamageCauser)
 {
 	HealthComponent->TakeDamage(DamageAmount);
@@ -135,7 +135,7 @@ void AScuttlingHusk::PlayAttackAnim()
 		this->Destroy();
 	}
 	return DamageAmount;
-}*/
+}
 
 void AScuttlingHusk::GetPatrolRoute(AEnemySpline*& PatrolRoute)
 {
