@@ -1,5 +1,10 @@
+
+
+
+
 #include "ScuttlingHusk.h"
 #include "ScuttlingHuskAIC.h"
+
 
 // make health a little random 
 
@@ -29,6 +34,7 @@ AScuttlingHusk::AScuttlingHusk()
 		enemyMesh->SetWorldScale3D(FVector(9.0));
 		enemyMesh->SetRelativeRotation(FRotator(-90.0, -90.0f, 0.0f));
 		enemyMesh->SetRelativeLocation(FVector(0.0f, 23.0f, 0.0f));
+		enemyMesh->SetIsReplicated(true);
 	}
 
 	// Load ABP Class
@@ -63,6 +69,7 @@ void AScuttlingHusk::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+
 void AScuttlingHusk::AttackEnd()
 {
 	OnAttackEnd.Broadcast();
@@ -75,6 +82,8 @@ void AScuttlingHusk::DamagedEnd()
 		MovementComponent->MaxSpeed = 400.0f;
 		
 }
+
+
 
 void AScuttlingHusk::Attack() 
 {
@@ -93,6 +102,7 @@ void AScuttlingHusk::Attack()
 	
 }
 
+
 void AScuttlingHusk::PlayAttackAnim()
 {
 	Super::PlayAttackAnim();
@@ -104,7 +114,7 @@ void AScuttlingHusk::PlayAttackAnim()
 	}
 }
 
-float AScuttlingHusk::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+/*float AScuttlingHusk::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
 	class AController* EventInstigator, AActor* DamageCauser)
 {
 	HealthComponent->TakeDamage(DamageAmount);
@@ -125,10 +135,12 @@ float AScuttlingHusk::TakeDamage(float DamageAmount, struct FDamageEvent const& 
 		this->Destroy();
 	}
 	return DamageAmount;
-}
+}*/
 
 void AScuttlingHusk::GetPatrolRoute(AEnemySpline*& PatrolRoute)
 {
 	IEnemyInter::GetPatrolRoute(PatrolRoute);
 	PatrolRoute = PatrolRoutePath;
 }
+
+

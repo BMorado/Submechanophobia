@@ -6,6 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+
 // Sets default values
 AEnemy::AEnemy()
 {
@@ -43,6 +44,7 @@ AEnemy::AEnemy()
 	MovementComponent->UpdatedComponent = CapsuleComponent;
 }
 
+
 // Called when the game starts or when spawned
 void AEnemy::BeginPlay()
 {
@@ -56,6 +58,8 @@ void AEnemy::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+
+
 void AEnemy::Attack()
 {
 	
@@ -68,6 +72,7 @@ void AEnemy::Attack()
 void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	
 
 }
 
@@ -80,4 +85,12 @@ float AEnemy::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, A
 void AEnemy::PlayAttackAnim()
 {
 }
+
+void AEnemy::OnTakeDamage()
+{
+}
+
+
+
+
 

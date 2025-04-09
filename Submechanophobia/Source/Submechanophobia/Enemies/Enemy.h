@@ -28,19 +28,25 @@ protected:
 	uint8 damage;
 	bool isDamagable = true;
 public:
+	
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	
 	UFUNCTION(BlueprintCallable, Category = "Functions")
-	virtual void PlayAttackAnim();
+	virtual void PlayAttackAnim() ;
+
+	UFUNCTION( BlueprintCallable,Category = "Functions")
+	virtual void OnTakeDamage();
 	
 	UFUNCTION(BlueprintCallable, Category = "Functions")
 	virtual void Attack() ;
 	
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnAttackEnd OnAttackEnd;
+	
 	
 	
 	
