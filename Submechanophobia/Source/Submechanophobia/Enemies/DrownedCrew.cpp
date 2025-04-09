@@ -84,8 +84,9 @@ void ADrownedCrew::PlayAttackAnim()
 	if (UAnimInstance* AnimInstance = enemyMesh->GetAnimInstance())
 	{
 		AnimInstance->Montage_Play(attackMontage);
-		GetWorld()->GetTimerManager().SetTimer(timer,this,&ADrownedCrew::Attack,0.05f,true);
-		//AnimInstance->Montage_SetEndDelegate(AttackMontageEndDelegate, attackMontage);
+		Attack();
+		//GetWorld()->GetTimerManager().SetTimer(timer,this,&ADrownedCrew::Attack,0.05f,true);
+		AnimInstance->Montage_SetEndDelegate(AttackMontageEndDelegate, attackMontage);
 	}
 }
 
@@ -99,8 +100,8 @@ float ADrownedCrew::TakeDamage(float DamageAmount, struct FDamageEvent const& Da
 		{
 			UAnimInstance* AnimInstance = enemyMesh->GetAnimInstance();
 			AnimInstance->Montage_Play(damagedMontage);
-			//AnimInstance->Montage_SetEndDelegate(DamagedMontageEndDelegate, damagedMontage);
-			//MovementComponent->MaxSpeed = 0;
+			AnimInstance->Montage_SetEndDelegate(DamagedMontageEndDelegate, damagedMontage);
+			MovementComponent->MaxSpeed = 0;
 			isDamagable = false;
 		}
 		
