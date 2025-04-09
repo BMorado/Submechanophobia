@@ -131,17 +131,12 @@ public:
 
     int32 FindAvailableHoleIndex();
 
-    UPROPERTY(ReplicatedUsing = OnRep_FlameEffect1)
+    UPROPERTY()
     UNiagaraComponent* FlameEffect1;
 
-    UPROPERTY(ReplicatedUsing = OnRep_FlameEffect2)
+    UPROPERTY()
     UNiagaraComponent* FlameEffect2;
 
-    UFUNCTION()
-    void OnRep_FlameEffect1();
-
-    UFUNCTION()
-    void OnRep_FlameEffect2();
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|UI")
     TSubclassOf<class UUserWidget> WinWidgetClass;

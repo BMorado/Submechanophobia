@@ -577,8 +577,6 @@ void AGuardianLeviathanBoss::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 
     DOREPLIFETIME(AGuardianLeviathanBoss, CurrentStage);
     DOREPLIFETIME(AGuardianLeviathanBoss, bIsPrimaryBoss);
-    DOREPLIFETIME(AGuardianLeviathanBoss, FlameEffect1);
-    DOREPLIFETIME(AGuardianLeviathanBoss, FlameEffect2);
     DOREPLIFETIME(AGuardianLeviathanBoss, ReplicatedSharedHealth);
     DOREPLIFETIME(AGuardianLeviathanBoss, bShouldPlayFireVFX);
     DOREPLIFETIME(AGuardianLeviathanBoss, bShouldStopFireVFX);
@@ -591,38 +589,24 @@ void AGuardianLeviathanBoss::OnRep_SharedHealth()
 }
 
 
-void AGuardianLeviathanBoss::OnRep_FlameEffect1()
-{
-    if (FlameEffect1)
-    {
-        FlameEffect1->Activate(true);
-    }
-
-}
-
-void AGuardianLeviathanBoss::OnRep_FlameEffect2()
-{
-    if (FlameEffect2)
-    {
-        FlameEffect2->Activate(); 
-    }
-}
-
 void AGuardianLeviathanBoss::OnRep_PlayFireVFX()
 {
-    if (FlameEffect1)
-    {
-        FlameEffect1->Activate();
-    }
+    if (HasAuthority()) return; // Avoid activating twice on server
 
-    if (FlameEffect2)
-    {
+    if (FlameEffect1 && FlameEffect1->IsRegistered())
+        FlameEffect1->Activate();
+
+    if (FlameEffect2 && FlameEffect2->IsRegistered())
         FlameEffect2->Activate();
-    }
 }
 
 void AGuardianLeviathanBoss::OnRep_StopFireVFX()
 {
-    if (FlameEffect1) FlameEffect1->Deactivate();
-    if (FlameEffect2) FlameEffect2->Deactivate();
+    if (HasAuthority()) return; // Server already did this
+
+    if (FlameEffect1 && FlameEffect1->IsRegistered())
+        FlameEffect1->Deactivate();
+
+    if (FlameEffect2 && FlameEffect2->IsRegistered())
+        FlameEffect2->Deactivate();
 }
