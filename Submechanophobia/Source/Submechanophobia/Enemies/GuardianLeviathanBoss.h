@@ -6,6 +6,7 @@
 #include "Enemy.h"
 #include "HealthComponent.h"
 #include "Animation/AnimInstance.h"
+#include "Net/UnrealNetwork.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GuardianLeviathanBoss.generated.h"
@@ -40,7 +41,7 @@ public:
     //UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss Stats")
     //float Health = 100.0f;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss Stats")
+    UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Boss Stats")
     int CurrentStage = 1;
 
     UFUNCTION(BlueprintCallable)
@@ -50,7 +51,7 @@ public:
     static float MaxSharedHealth;
     static AGuardianLeviathanBoss* PrimaryBoss; // Used to run stage transitions only
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss")
+    UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Boss")
     bool bIsPrimaryBoss = false;
 
     // --- Anim Montages ---
@@ -130,13 +131,39 @@ public:
 
     int32 FindAvailableHoleIndex();
 
-    UPROPERTY()
+    UPROPERTY(ReplicatedUsing = OnRep_FlameEffect1)
     UNiagaraComponent* FlameEffect1;
 
-    UPROPERTY()
+    UPROPERTY(ReplicatedUsing = OnRep_FlameEffect2)
     UNiagaraComponent* FlameEffect2;
+
+    UFUNCTION()
+    void OnRep_FlameEffect1();
+
+    UFUNCTION()
+    void OnRep_FlameEffect2();
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|UI")
     TSubclassOf<class UUserWidget> WinWidgetClass;
+
+    void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+   
+    UPROPERTY(ReplicatedUsing = OnRep_SharedHealth)
+    float ReplicatedSharedHealth;
+
+    UFUNCTION()
+    void OnRep_SharedHealth();
+    
+    UPROPERTY(ReplicatedUsing = OnRep_PlayFireVFX)
+    bool bShouldPlayFireVFX = false;
+
+    UFUNCTION()
+    void OnRep_PlayFireVFX();
+
+    UPROPERTY(ReplicatedUsing = OnRep_StopFireVFX)
+    bool bShouldStopFireVFX = false;
+
+    UFUNCTION()
+    void OnRep_StopFireVFX();
 
 };

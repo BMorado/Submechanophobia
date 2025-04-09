@@ -82,6 +82,12 @@ void AGuardianLeviathanBoss::BeginPlay()
         }
     }
 
+    if (!FlameEffect1 || !FlameEffect2)
+    {
+        UE_LOG(LogTemp, Error, TEXT("FlameEffect Niagara Components are not initialized!"));
+    }
+
+    ReplicatedSharedHealth = SharedHealth;
  
 }
 
@@ -101,19 +107,15 @@ void AGuardianLeviathanBoss::FireAttack()
 
     Anim->Montage_Play(FireMontage);
 
+    // SERVER-ONLY visual activation
     if (FlameEffect1) FlameEffect1->Activate();
     if (FlameEffect2) FlameEffect2->Activate();
-
+    // this will trigger onRep
+    bShouldPlayFireVFX = true;
     
 
     //USED FOR TESTING
     ApplySharedDamage(10.f);
-
-    //FOR BOSS WIDGET HEALTH LATER
-    //if (HealthComponent)
-    //{
-    //    HealthComponent->SetCurrentHealth(GetSharedHealth()); // Keeps widget health synced
-    //}
 
     UE_LOG(LogTemp, Warning, TEXT("Boss current shared health: %.2f"), GetSharedHealth());
     // === END TEST ===
@@ -150,12 +152,19 @@ void AGuardianLeviathanBoss::ApplyFireDamage()
 
 void AGuardianLeviathanBoss::StopFireBreath()
 {
+
+    // SERVER deactivates directly
     if (FlameEffect1) FlameEffect1->Deactivate();
     if (FlameEffect2) FlameEffect2->Deactivate();
+    bShouldStopFireVFX = true;
+    
 
     FireDamageHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
     GetWorldTimerManager().ClearTimer(FireTimerHandle);
+    
+    bShouldPlayFireVFX = false;
+    bShouldStopFireVFX = false;
 }
 
 void AGuardianLeviathanBoss::ApplyScreechDamage()
@@ -441,6 +450,7 @@ float AGuardianLeviathanBoss::TakeDamage(float DamageAmount, FDamageEvent const&
         HealthComponent->TakeDamage(DamageAmount);
 
         float CurrentHealth = HealthComponent->GetCurrentHealth();
+        ReplicatedSharedHealth = SharedHealth;
 
         // Call stage logic
         OnBossDamaged(CurrentHealth);
@@ -561,3 +571,58 @@ int32 AGuardianLeviathanBoss::FindAvailableHoleIndex()
     return Indices[RandomIndex];
 }
 
+void AGuardianLeviathanBoss::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(AGuardianLeviathanBoss, CurrentStage);
+    DOREPLIFETIME(AGuardianLeviathanBoss, bIsPrimaryBoss);
+    DOREPLIFETIME(AGuardianLeviathanBoss, FlameEffect1);
+    DOREPLIFETIME(AGuardianLeviathanBoss, FlameEffect2);
+    DOREPLIFETIME(AGuardianLeviathanBoss, ReplicatedSharedHealth);
+    DOREPLIFETIME(AGuardianLeviathanBoss, bShouldPlayFireVFX);
+    DOREPLIFETIME(AGuardianLeviathanBoss, bShouldStopFireVFX);
+}
+
+void AGuardianLeviathanBoss::OnRep_SharedHealth()
+{
+    SharedHealth = ReplicatedSharedHealth;
+    UE_LOG(LogTemp, Log, TEXT("[Client] SharedHealth replicated: %.2f"), SharedHealth);
+}
+
+
+void AGuardianLeviathanBoss::OnRep_FlameEffect1()
+{
+    if (FlameEffect1)
+    {
+        FlameEffect1->Activate(true);
+    }
+
+}
+
+void AGuardianLeviathanBoss::OnRep_FlameEffect2()
+{
+    if (FlameEffect2)
+    {
+        FlameEffect2->Activate(); 
+    }
+}
+
+void AGuardianLeviathanBoss::OnRep_PlayFireVFX()
+{
+    if (FlameEffect1)
+    {
+        FlameEffect1->Activate();
+    }
+
+    if (FlameEffect2)
+    {
+        FlameEffect2->Activate();
+    }
+}
+
+void AGuardianLeviathanBoss::OnRep_StopFireVFX()
+{
+    if (FlameEffect1) FlameEffect1->Deactivate();
+    if (FlameEffect2) FlameEffect2->Deactivate();
+}
