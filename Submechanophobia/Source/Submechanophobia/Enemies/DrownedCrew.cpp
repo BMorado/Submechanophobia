@@ -65,7 +65,7 @@ void ADrownedCrew::Tick(float DeltaTime)
 void ADrownedCrew::Attack()
 {
 	Super::Attack();
-	FVector start = enemyMesh->GetSocketLocation("PC_HeadSocket");
+	/*FVector start = enemyMesh->GetSocketLocation("PC_HeadSocket");
 	FVector end = enemyMesh->GetSocketLocation("PC_HeadSocket");
 	
 	TArray<AActor*> ActorsToIgnore;
@@ -75,25 +75,25 @@ void ADrownedCrew::Attack()
 		GetWorld(),start,end,30.0f,UEngineTypes::ConvertToTraceType(ECC_Camera)
 		,false,ActorsToIgnore,EDrawDebugTrace::ForDuration,hits,true);
 	
-	UGameplayStatics::ApplyDamage(hits.GetActor(),damage,nullptr,this,nullptr);
+	UGameplayStatics::ApplyDamage(hits.GetActor(),damage,nullptr,this,nullptr);*/
 }
 
 void ADrownedCrew::PlayAttackAnim()
 {
 	Super::PlayAttackAnim();
-	if (UAnimInstance* AnimInstance = enemyMesh->GetAnimInstance())
+	/*if (UAnimInstance* AnimInstance = enemyMesh->GetAnimInstance())
 	{
 		AnimInstance->Montage_Play(attackMontage);
 		Attack();
 		//GetWorld()->GetTimerManager().SetTimer(timer,this,&ADrownedCrew::Attack,0.05f,true);
 		AnimInstance->Montage_SetEndDelegate(AttackMontageEndDelegate, attackMontage);
-	}
+	}*/
 }
 
 float ADrownedCrew::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
 	class AController* EventInstigator, AActor* DamageCauser)
 {
-	HealthComponent->TakeDamage(DamageAmount);
+	/*HealthComponent->TakeDamage(DamageAmount);
 	if (HealthComponent->GetCurrentHealth() >= 0.0f)
 	{
 		if (isDamagable == true)
@@ -109,18 +109,18 @@ float ADrownedCrew::TakeDamage(float DamageAmount, struct FDamageEvent const& Da
 	if (HealthComponent->GetCurrentHealth() <= 0.0f)
 	{
 		this->Destroy();
-	}
+	}*/
 	return DamageAmount;
 }
 
 void ADrownedCrew::AttackEnd()
 {
-	OnAttackEnd.Broadcast();
-	GetWorld()->GetTimerManager().ClearTimer(timer);
+	/*OnAttackEnd.Broadcast();
+	GetWorld()->GetTimerManager().ClearTimer(timer);*/
 }
 
 void ADrownedCrew::DamagedEnd()
 {
-	isDamagable = true;
-	MovementComponent->MaxSpeed = 400.0f;
+	/*isDamagable = true;
+	MovementComponent->MaxSpeed = 400.0f;*/
 }
