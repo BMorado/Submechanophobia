@@ -114,7 +114,7 @@ void AScuttlingHusk::PlayAttackAnim()
 	}
 }
 
-float AScuttlingHusk::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+/*float AScuttlingHusk::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
 	class AController* EventInstigator, AActor* DamageCauser)
 {
 	HealthComponent->TakeDamage(DamageAmount);
@@ -135,7 +135,7 @@ float AScuttlingHusk::TakeDamage(float DamageAmount, struct FDamageEvent const& 
 		this->Destroy();
 	}
 	return DamageAmount;
-}
+}*/
 
 void AScuttlingHusk::GetPatrolRoute(AEnemySpline*& PatrolRoute)
 {

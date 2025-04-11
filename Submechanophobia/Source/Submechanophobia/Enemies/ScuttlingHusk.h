@@ -39,7 +39,7 @@ private:
 	virtual void Attack() override;
 	virtual void PlayAttackAnim() override;
 	
-	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	//virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void GetPatrolRoute(AEnemySpline*& PatrolRoute) override;
 	
 	FOnMontageEnded AttackMontageEndDelegate;
