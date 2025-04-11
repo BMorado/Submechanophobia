@@ -10,6 +10,7 @@
 #include "Components/InputComponent.h"
 #include "Submechanophobia/Enemies/Enemy.h"
 #include "Submechanophobia/Weapons/WeaponBase.h"
+#include "Net/UnrealNetwork.h"
  
 
 
@@ -30,6 +31,7 @@ AAPlayerCharacter::AAPlayerCharacter()
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationPitch = true;
 	bUseControllerRotationRoll = false;
+	bReplicates = true;
 
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f,500.0f,0.0f);
@@ -42,7 +44,9 @@ AAPlayerCharacter::AAPlayerCharacter()
 	{
 		MeleeAttackMontage = MeleeAttackMontageObject.Object;
 	}
-	HitResult = new FHitResult(0); 
+	HitResult = new FHitResult(0);
+
+
 }
 
 // Called when the game starts or when spawned
@@ -124,23 +128,43 @@ void AAPlayerCharacter::Look(const FInputActionValue& Value)
 
 void AAPlayerCharacter::FireWeapon()
 {
+	
 	if (currentWeapon != nullptr && currentWeapon->magazineAmmo > 0 && canShoot)
 	{
-		RayCast(); 
-		currentWeapon->magazineAmmo--;
-		UGameplayStatics::ApplyDamage(HitResult->GetActor(),currentWeapon->damage,nullptr,this,nullptr);
-		GetWorld()->GetTimerManager().SetTimer(UnusedHandle,this,&AAPlayerCharacter::WeaponFireDelay,currentWeapon->fireRate,false); 
+		RPC_FireWeapon_Implementation(); 
 	}
-	
 }
+
+inline void AAPlayerCharacter::RPC_FireWeapon_Implementation()
+{
+	MutiCast_FireWeapon_Implementation(); 
+}
+
+
+void AAPlayerCharacter::MutiCast_FireWeapon_Implementation()
+{
+
+	RayCast();
+}
+
 
 
 void AAPlayerCharacter::WeaponFireDelay()
 {
 	canShoot = true ; 
 }
+
+
+
 //hides secondary weapon, makes primary weapon visible then sets primary to current weapon
 void AAPlayerCharacter::SwapWeaponPrimary()
+{
+	
+		RPC_EquipPrimary(); 
+	
+}
+
+void AAPlayerCharacter::EquipPrimary()
 {
 	if (PrimaryWeapon && currentWeapon != PrimaryWeapon)
 	{
@@ -150,12 +174,18 @@ void AAPlayerCharacter::SwapWeaponPrimary()
 		PrimaryWeapon->weaponMesh->SetVisibility(true);
 		currentWeapon =  PrimaryWeapon;
 	}
-	
-	
 }
 
 //hides primary weapon, makes secondary weapon visible then sets secondary to current weapon
 void AAPlayerCharacter::SwapWeaponSecondary()
+{
+	if (SecondaryWeapon && currentWeapon != SecondaryWeapon)
+	{
+		RPC_EquipSecondary(); 
+	}
+}
+
+void AAPlayerCharacter::EquipSecondary()
 {
 	if (SecondaryWeapon && currentWeapon != SecondaryWeapon)
 	{
@@ -165,7 +195,6 @@ void AAPlayerCharacter::SwapWeaponSecondary()
 		SecondaryWeapon->weaponMesh->SetVisibility(true);
 		currentWeapon =  SecondaryWeapon;
 	}
-	
 }
 
 void AAPlayerCharacter::Reload()
@@ -173,7 +202,6 @@ void AAPlayerCharacter::Reload()
 	// Check if pointer isn't null and that we have a weapon
 	if (currentWeapon)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Current Mag  Pre-Reload: %u"),currentWeapon->magazineAmmo);
 		
 		// See if the number of "bullets" is below capacity
 		if (currentWeapon->magazineAmmo < currentWeapon->magazineCapacity && currentWeapon->reserveAmmo != 0)
@@ -185,7 +213,6 @@ void AAPlayerCharacter::Reload()
 			currentWeapon->reserveAmmo -= ReloadCalculation;
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Current Mag  Post-Reload: %u"),currentWeapon->magazineAmmo);
 
 }
 	
@@ -209,17 +236,51 @@ void  AAPlayerCharacter::RayCast()
 		//PlayAnimMontage(MeleeAttackMontage);
 		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 255), true);
 		
+		currentWeapon->magazineAmmo--;
+		UGameplayStatics::ApplyDamage(HitResult->GetActor(),currentWeapon->damage,nullptr,this,nullptr);
+		GetWorld()->GetTimerManager().SetTimer(UnusedHandle,this,&AAPlayerCharacter::WeaponFireDelay,currentWeapon->fireRate,false);
 	}
 	
 }
 
 
+void AAPlayerCharacter::RPC_EquipPrimary_Implementation()
+{
+	NetMulticast_EquipPrimary_Implementation();
+
+}
+
+
+
+void AAPlayerCharacter::RPC_EquipSecondary_Implementation()
+{
+	 NetMulticast_EquipSecondary(); 
+}
+
+void AAPlayerCharacter::NetMulticast_EquipSecondary_Implementation()
+{
+	EquipSecondary();
+}
+
+void AAPlayerCharacter::NetMulticast_EquipPrimary_Implementation()
+{
+	EquipPrimary();
+
+}
+
+void AAPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AAPlayerCharacter, currentWeapon); // or whatever your variable is
+	DOREPLIFETIME(AAPlayerCharacter, PrimaryWeapon); // or whatever your variable is
+	DOREPLIFETIME(AAPlayerCharacter, SecondaryWeapon); // or whatever your variable is
+
+
+}
+
 
 void AAPlayerCharacter::AddWeapon( AUWeaponBase* weapon)
 {
-	
-	
-	
 	FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
 	//checks if the weapon being added is a Primary weapon
 	if (weapon->isPrimary)
@@ -258,9 +319,4 @@ void AAPlayerCharacter::AddWeapon( AUWeaponBase* weapon)
 
 		
 	}
-
-	//attach weapon actor to player mesh socket 
-}
-
-
-
+}	//attach weapon actor to player mesh so

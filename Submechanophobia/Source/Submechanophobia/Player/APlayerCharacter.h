@@ -8,6 +8,7 @@
 #include "Submechanophobia/Weapons/WeaponBase.h"
 #include "APlayerCharacter.generated.h"
 
+
 class UInputMappingContext;
 class UInputAction;
 
@@ -71,13 +72,13 @@ protected:
 	FTimerHandle UnusedHandle;
 
 	// Weapons
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "gameplay");
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,	Replicated,  Category = "gameplay");
 	AUWeaponBase* currentWeapon;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "gameplay");
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = "gameplay");
 	AUWeaponBase* PrimaryWeapon;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "gameplay");
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Replicated, Category = "gameplay");
 	AUWeaponBase* SecondaryWeapon; 
 
 	FHitResult* HitResult;
@@ -89,15 +90,49 @@ protected:
 	void StopJump();
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+
 	
 	void FireWeapon();
+	
 	void SwapWeaponPrimary();
+	void EquipPrimary();
+	
 	void SwapWeaponSecondary();
+	void EquipSecondary();
+	
 	void Reload(); 
 	void WeaponFireDelay(); 
 
+	
 	void RayCast();
+
+
 	
+	UFUNCTION(Server,Reliable)
+	void RPC_EquipPrimary();
 	
+	UFUNCTION(Server,Reliable)
+	void RPC_EquipSecondary();
+
+	UFUNCTION(NetMulticast,Reliable)
+	void NetMulticast_EquipSecondary();
 	
+	UFUNCTION(NetMulticast,Reliable)
+	void NetMulticast_EquipPrimary();
+
+
+
+
+
+	UFUNCTION(Server,Reliable)
+	void RPC_FireWeapon(); 
+
+	UFUNCTION(NetMulticast,Reliable)
+	void MutiCast_FireWeapon(); 
+	
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };
+
+
+
+
