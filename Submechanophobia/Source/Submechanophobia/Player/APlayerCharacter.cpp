@@ -22,12 +22,8 @@ AAPlayerCharacter::AAPlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Player Camera"));
-	Camera->SetupAttachment(GetMesh(), TEXT("HeadCameraSocket")); // or TEXT("head")
+	Camera->SetupAttachment(GetCapsuleComponent());
 	Camera->bUsePawnControlRotation = true;
-
-	Camera->SetRelativeLocation(FVector::ZeroVector);
-	Camera->SetRelativeRotation(FRotator::ZeroRotator);
-	
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationPitch = true;
 	bUseControllerRotationRoll = false;
