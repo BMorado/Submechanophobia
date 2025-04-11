@@ -15,7 +15,7 @@
 //static variables
 float AGuardianLeviathanBoss::SharedHealth = 100.f;
 float AGuardianLeviathanBoss::MaxSharedHealth = 100.f;
-AGuardianLeviathanBoss* AGuardianLeviathanBoss::PrimaryBoss = nullptr;
+//AGuardianLeviathanBoss* AGuardianLeviathanBoss::PrimaryBoss = nullptr;
 TArray<int32> AGuardianLeviathanBoss::OccupiedHoleIndices;
 
 AGuardianLeviathanBoss::AGuardianLeviathanBoss()
@@ -42,29 +42,48 @@ AGuardianLeviathanBoss::AGuardianLeviathanBoss()
     SetReplicatingMovement(true);
 }
 
+
 void AGuardianLeviathanBoss::BeginPlay()
 {
     Super::BeginPlay();
 
-    // Ensure clean state on play start
-    if (!bIsPrimaryBoss)
+   
+    if (HasAuthority())
     {
-        PrimaryBoss = nullptr;
-    }
+        static bool bHasPrimaryBeenAssigned = false;
 
-    if (HasAuthority() && !PrimaryBoss)
-    {
-        PrimaryBoss = this;
-        SharedHealth = MaxSharedHealth;
-    }
-
-    AAIController* AIController = Cast<AAIController>(GetController());
-    if (AIController)
-    {
-        UBlackboardComponent* BlackboardComp = AIController->GetBlackboardComponent();
-        if (BlackboardComp)
+        if (!bHasPrimaryBeenAssigned)
         {
-            BlackboardComp->SetValueAsInt(FName("CurrentStage"), CurrentStage); // default = 1, after should follow what is set (when second serpent is created CurrentStage = 2)
+            bHasPrimaryBeenAssigned = true;
+            bIsPrimaryBoss = true;
+            PrimaryBoss = this;
+            SharedHealth = MaxSharedHealth;
+
+            UE_LOG(LogTemp, Warning, TEXT("[Primary Assigned] %s is the PrimaryBoss."), *GetName());
+        }
+        else
+        {
+            bIsPrimaryBoss = false;
+           // PrimaryBoss = nullptr;
+            UE_LOG(LogTemp, Warning, TEXT("[Secondary Spawned] %s is not the PrimaryBoss."), *GetName());
+        }
+    }
+
+    // Optional: Debug info
+    UE_LOG(LogTemp, Warning, TEXT("BeginPlay: %s - isPrimary: %s - HasAuthority: %s"), *GetName(),
+        bIsPrimaryBoss ? TEXT("true") : TEXT("false"),
+        HasAuthority() ? TEXT("true") : TEXT("false"));
+
+    if (HasAuthority())
+    {
+        AAIController* AIController = Cast<AAIController>(GetController());
+        if (AIController)
+        {
+            UBlackboardComponent* BlackboardComp = AIController->GetBlackboardComponent();
+            if (BlackboardComp)
+            {
+                BlackboardComp->SetValueAsInt(FName("CurrentStage"), CurrentStage);
+            }
         }
     }
 
@@ -96,6 +115,8 @@ void AGuardianLeviathanBoss::GetLifetimeReplicatedProps(TArray< FLifetimePropert
     DOREPLIFETIME(AGuardianLeviathanBoss, TransitionMontage);
     DOREPLIFETIME(AGuardianLeviathanBoss, ReplicatedSharedHealth);
     DOREPLIFETIME(AGuardianLeviathanBoss, CurrentStage);
+    DOREPLIFETIME(AGuardianLeviathanBoss, bIsPrimaryBoss);
+    DOREPLIFETIME(AGuardianLeviathanBoss, PrimaryBoss);
 }
 
 void AGuardianLeviathanBoss::OnRep_CurrentStage()
@@ -678,32 +699,32 @@ void AGuardianLeviathanBoss::Multicast_OnBossDefeated_Implementation()
 }
 
 
-void AGuardianLeviathanBoss::Multicast_SpawnSerpent_Implementation(FVector Location, FRotator Rotation, int32 Stage, int32 HoleIndex)
-{
-    if (!HasAuthority())
-    {
-        FActorSpawnParameters SpawnParams;
-        SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-        AGuardianLeviathanBoss* NewSerpent = GetWorld()->SpawnActor<AGuardianLeviathanBoss>(
-            GetClass(),
-            Location,
-            Rotation,
-            SpawnParams
-        );
-
-        if (NewSerpent)
-        {
-            NewSerpent->HoleTransforms = this->HoleTransforms;
-            NewSerpent->LastHoleIndex = HoleIndex;
-            OccupiedHoleIndices.Add(HoleIndex);
-
-            NewSerpent->PrimaryBoss = this->PrimaryBoss; // Still static but consistent on clients
-            NewSerpent->CurrentStage = Stage;
-            NewSerpent->SetReplicates(true);
-            NewSerpent->SetReplicatingMovement(true);
-
-            UE_LOG(LogTemp, Warning, TEXT("Client: Serpent for Stage %d spawned at hole %d"), Stage, HoleIndex);
-        }
-    }
-}
+//void AGuardianLeviathanBoss::Multicast_SpawnSerpent_Implementation(FVector Location, FRotator Rotation, int32 Stage, int32 HoleIndex)
+//{
+//    if (!HasAuthority())
+//    {
+//        FActorSpawnParameters SpawnParams;
+//        SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+//
+//        AGuardianLeviathanBoss* NewSerpent = GetWorld()->SpawnActor<AGuardianLeviathanBoss>(
+//            GetClass(),
+//            Location,
+//            Rotation,
+//            SpawnParams
+//        );
+//
+//        if (NewSerpent)
+//        {
+//            NewSerpent->HoleTransforms = this->HoleTransforms;
+//            NewSerpent->LastHoleIndex = HoleIndex;
+//            OccupiedHoleIndices.Add(HoleIndex);
+//
+//            NewSerpent->PrimaryBoss = this->PrimaryBoss; // Still static but consistent on clients
+//            NewSerpent->CurrentStage = Stage;
+//            NewSerpent->SetReplicates(true);
+//            NewSerpent->SetReplicatingMovement(true);
+//
+//            UE_LOG(LogTemp, Warning, TEXT("Client: Serpent for Stage %d spawned at hole %d"), Stage, HoleIndex);
+//        }
+//    }
+//}

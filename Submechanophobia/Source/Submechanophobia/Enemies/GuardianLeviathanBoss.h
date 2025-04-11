@@ -61,9 +61,10 @@ public:
     static float GetSharedHealth();
 
 
-    static AGuardianLeviathanBoss* PrimaryBoss; 
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
+    AGuardianLeviathanBoss* PrimaryBoss = nullptr;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated)
     bool bIsPrimaryBoss = false;
 
     void OnBossDamaged(float);
@@ -170,8 +171,10 @@ public:
     UFUNCTION(NetMulticast, Reliable)
     void Multicast_OnBossDefeated();
 
-    UFUNCTION(NetMulticast, Reliable)
-    void Multicast_SpawnSerpent(FVector Location, FRotator Rotation, int32 Stage, int32 HoleIndex);
+    /*UFUNCTION(NetMulticast, Reliable)
+    void Multicast_SpawnSerpent(SpawnHole.Location, SpawnHole.Rotation, 2, SpawnIndex);*/
    
+
+    
 
 };
