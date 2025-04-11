@@ -36,7 +36,7 @@ public:
 
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite); 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Replicated); 
 	//UPROPERTY(EditAnywhere)
 	class UCameraComponent* Camera;
 	
@@ -81,7 +81,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Replicated, Category = "gameplay");
 	AUWeaponBase* SecondaryWeapon; 
 
-	FHitResult* HitResult;
+	
 
 	bool canShoot = true; 
 	
@@ -128,7 +128,7 @@ protected:
 	void RPC_FireWeapon(); 
 
 	UFUNCTION(NetMulticast,Reliable)
-	void MutiCast_FireWeapon(); 
+	void Muticast_FireWeapon(); 
 	
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

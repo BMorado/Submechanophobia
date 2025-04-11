@@ -40,7 +40,7 @@ AAPlayerCharacter::AAPlayerCharacter()
 	{
 		MeleeAttackMontage = MeleeAttackMontageObject.Object;
 	}
-	HitResult = new FHitResult(0);
+	
 
 
 }
@@ -127,17 +127,18 @@ void AAPlayerCharacter::FireWeapon()
 	
 	if (currentWeapon != nullptr && currentWeapon->magazineAmmo > 0 && canShoot)
 	{
-		RPC_FireWeapon_Implementation(); 
+		if (HasAuthority()){Muticast_FireWeapon();}
+		else{RPC_FireWeapon();}
 	}
 }
 
-inline void AAPlayerCharacter::RPC_FireWeapon_Implementation()
+ void AAPlayerCharacter::RPC_FireWeapon_Implementation()
 {
-	MutiCast_FireWeapon_Implementation(); 
+	Muticast_FireWeapon(); 
 }
 
 
-void AAPlayerCharacter::MutiCast_FireWeapon_Implementation()
+void AAPlayerCharacter::Muticast_FireWeapon_Implementation()
 {
 
 	RayCast();
@@ -222,18 +223,18 @@ void  AAPlayerCharacter::RayCast()
 	FVector StartTrace = Camera->GetComponentLocation();
 	FVector ForwardVector = Camera->GetForwardVector();
 	FVector offset = FMath::VRand() * 2.0f;
-	 
+	FHitResult HitResult;
 	FVector EndTrace = (currentWeapon->bulletSpread + ForwardVector * 5000.f) + StartTrace;
 	
 	FCollisionQueryParams* CQP = new FCollisionQueryParams();
 	CQP->bIgnoreBlocks = false;
-	if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Camera, *CQP))
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Camera, *CQP))
 	{
 		//PlayAnimMontage(MeleeAttackMontage);
 		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 255), true);
 		
 		currentWeapon->magazineAmmo--;
-		UGameplayStatics::ApplyDamage(HitResult->GetActor(),currentWeapon->damage,nullptr,this,nullptr);
+		UGameplayStatics::ApplyDamage(HitResult.GetActor(),currentWeapon->damage,nullptr,this,nullptr);
 		GetWorld()->GetTimerManager().SetTimer(UnusedHandle,this,&AAPlayerCharacter::WeaponFireDelay,currentWeapon->fireRate,false);
 	}
 	
@@ -242,7 +243,7 @@ void  AAPlayerCharacter::RayCast()
 
 void AAPlayerCharacter::RPC_EquipPrimary_Implementation()
 {
-	NetMulticast_EquipPrimary_Implementation();
+	NetMulticast_EquipPrimary();
 
 }
 
@@ -271,6 +272,7 @@ void AAPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(AAPlayerCharacter, PrimaryWeapon); // or whatever your variable is
 	DOREPLIFETIME(AAPlayerCharacter, SecondaryWeapon); // or whatever your variable is
 
+	DOREPLIFETIME(AAPlayerCharacter, Camera); // or whatever your variable is
 
 }
 
