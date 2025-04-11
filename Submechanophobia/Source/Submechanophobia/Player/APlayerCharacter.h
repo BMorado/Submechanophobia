@@ -100,7 +100,10 @@ protected:
 	void SwapWeaponSecondary();
 	void EquipSecondary();
 	
+	void ReloadBinding();
+
 	void Reload(); 
+	
 	void WeaponFireDelay(); 
 
 	
@@ -128,7 +131,18 @@ protected:
 	void RPC_FireWeapon(); 
 
 	UFUNCTION(NetMulticast,Reliable)
-	void Muticast_FireWeapon(); 
+	void Muticast_FireWeapon();
+
+
+
+
+
+	UFUNCTION(Server,Reliable)
+	void RPC_Reload(); 
+
+	UFUNCTION(NetMulticast,Reliable)
+	void Muticast_Reload();
+
 	
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

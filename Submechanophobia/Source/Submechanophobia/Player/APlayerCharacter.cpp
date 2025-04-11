@@ -79,7 +79,7 @@ void AAPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Look);
 		EnhancedInput->BindAction(SwapToPrimaryAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::SwapWeaponPrimary);
 		EnhancedInput->BindAction(SwapToSecondaryAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::SwapWeaponSecondary);
-		EnhancedInput->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Reload);
+		EnhancedInput->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::ReloadBinding);
 	}
 }
 
@@ -125,11 +125,15 @@ void AAPlayerCharacter::Look(const FInputActionValue& Value)
 void AAPlayerCharacter::FireWeapon()
 {
 	
-	if (currentWeapon != nullptr && currentWeapon->magazineAmmo > 0 && canShoot)
-	{
-		if (HasAuthority()){Muticast_FireWeapon();}
-		else{RPC_FireWeapon();}
-	}
+	// if (currentWeapon != nullptr && currentWeapon->magazineAmmo > 0 && canShoot)
+	// {
+	// 	if (HasAuthority()){Muticast_FireWeapon();}
+	// 	else{RPC_FireWeapon();}
+	// }
+
+	if (HasAuthority()){Muticast_FireWeapon();}
+	 	else{RPC_FireWeapon();}
+	
 }
 
  void AAPlayerCharacter::RPC_FireWeapon_Implementation()
@@ -218,24 +222,27 @@ void AAPlayerCharacter::Reload()
 
 void  AAPlayerCharacter::RayCast()
 {
-	canShoot = false;
+	if (currentWeapon != nullptr && currentWeapon->magazineAmmo > 0 && canShoot){
+		canShoot = false;
 	
-	FVector StartTrace = Camera->GetComponentLocation();
-	FVector ForwardVector = Camera->GetForwardVector();
-	FVector offset = FMath::VRand() * 2.0f;
-	FHitResult HitResult;
-	FVector EndTrace = (currentWeapon->bulletSpread + ForwardVector * 5000.f) + StartTrace;
+		FVector StartTrace = Camera->GetComponentLocation();
+		FVector ForwardVector = Camera->GetForwardVector();
+		FVector offset = FMath::VRand() * 2.0f;
+		FHitResult HitResult;
+		FVector EndTrace = (currentWeapon->bulletSpread + ForwardVector * 5000.f) + StartTrace;
 	
-	FCollisionQueryParams* CQP = new FCollisionQueryParams();
-	CQP->bIgnoreBlocks = false;
-	if (GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Camera, *CQP))
-	{
-		//PlayAnimMontage(MeleeAttackMontage);
-		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 255), true);
+		FCollisionQueryParams* CQP = new FCollisionQueryParams();
+		CQP->bIgnoreBlocks = false;
+		if (GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Camera, *CQP))
+		{
+			//PlayAnimMontage(MeleeAttackMontage);
+			DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 255), true);
+
 		
-		currentWeapon->magazineAmmo--;
-		UGameplayStatics::ApplyDamage(HitResult.GetActor(),currentWeapon->damage,nullptr,this,nullptr);
-		GetWorld()->GetTimerManager().SetTimer(UnusedHandle,this,&AAPlayerCharacter::WeaponFireDelay,currentWeapon->fireRate,false);
+			currentWeapon->magazineAmmo--;
+			UGameplayStatics::ApplyDamage(HitResult.GetActor(),currentWeapon->damage,nullptr,this,nullptr);
+			GetWorld()->GetTimerManager().SetTimer(UnusedHandle,this,&AAPlayerCharacter::WeaponFireDelay,currentWeapon->fireRate,false);
+		}	
 	}
 	
 }
@@ -264,6 +271,26 @@ void AAPlayerCharacter::NetMulticast_EquipPrimary_Implementation()
 	EquipPrimary();
 
 }
+
+void AAPlayerCharacter::RPC_Reload_Implementation()
+{
+	Muticast_Reload();
+}
+
+
+void AAPlayerCharacter::Muticast_Reload_Implementation()
+{
+	Reload();
+}
+
+void AAPlayerCharacter::ReloadBinding()
+{
+	if (HasAuthority()){Muticast_Reload();}
+	else{RPC_Reload();}
+}
+
+
+
 
 void AAPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
