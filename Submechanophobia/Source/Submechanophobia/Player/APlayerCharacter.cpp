@@ -83,7 +83,10 @@ void AAPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	}
 }
 
-
+AUWeaponBase* AAPlayerCharacter::GetCurrentWeapon()
+{
+	return currentWeapon; 
+}
 
 
 void AAPlayerCharacter::StartJump()

@@ -21,6 +21,8 @@ public:
 	// Sets default values for this character's properties
 	AAPlayerCharacter();
 
+	AUWeaponBase* GetCurrentWeapon(); 
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -34,7 +36,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddWeapon( AUWeaponBase* weapon);
 
-
+	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Replicated); 
 	//UPROPERTY(EditAnywhere)
@@ -91,6 +93,7 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 
+	
 	
 	void FireWeapon();
 	
