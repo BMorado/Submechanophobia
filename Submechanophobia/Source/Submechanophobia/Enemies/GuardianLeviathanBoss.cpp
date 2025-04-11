@@ -198,7 +198,7 @@ void AGuardianLeviathanBoss::OnBossDamaged(float CurrentHealth)
             UE_LOG(LogTemp, Warning, TEXT("Second serpent spawned at hole %d"), SpawnIndex);
 
             // Replicate spawn to clients
-            Multicast_SpawnSerpent(SpawnHole.Location, SpawnHole.Rotation, 2, SpawnIndex);
+            //Multicast_SpawnSerpent(SpawnHole.Location, SpawnHole.Rotation, 2, SpawnIndex);
         }
     }
     // --- Stage 3 ---
@@ -237,7 +237,7 @@ void AGuardianLeviathanBoss::OnBossDamaged(float CurrentHealth)
             UE_LOG(LogTemp, Warning, TEXT("Third serpent spawned at hole %d"), SpawnIndex);
 
             // Replicate spawn to clients
-            Multicast_SpawnSerpent(SpawnHole.Location, SpawnHole.Rotation, 3, SpawnIndex);
+            //Multicast_SpawnSerpent(SpawnHole.Location, SpawnHole.Rotation, 3, SpawnIndex);
         }
     }
 
