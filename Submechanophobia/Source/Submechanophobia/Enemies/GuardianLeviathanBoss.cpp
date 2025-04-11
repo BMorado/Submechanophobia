@@ -50,22 +50,23 @@ void AGuardianLeviathanBoss::BeginPlay()
    
     if (HasAuthority())
     {
-        static bool bHasPrimaryBeenAssigned = false;
+        TArray<AActor*> FoundBosses;
+        UGameplayStatics::GetAllActorsOfClass(GetWorld(), AGuardianLeviathanBoss::StaticClass(), FoundBosses);
 
-        if (!bHasPrimaryBeenAssigned)
+        if (FoundBosses.Num() == 1) // First one spawned
         {
-            bHasPrimaryBeenAssigned = true;
             bIsPrimaryBoss = true;
             PrimaryBoss = this;
             SharedHealth = MaxSharedHealth;
-
             UE_LOG(LogTemp, Warning, TEXT("[Primary Assigned] %s is the PrimaryBoss."), *GetName());
         }
         else
         {
             bIsPrimaryBoss = false;
-           // PrimaryBoss = nullptr;
-            UE_LOG(LogTemp, Warning, TEXT("[Secondary Spawned] %s is not the PrimaryBoss."), *GetName());
+            PrimaryBoss = Cast<AGuardianLeviathanBoss>(FoundBosses[0]); // Assume the first one is still valid
+            UE_LOG(LogTemp, Warning, TEXT("[Secondary Spawned] %s is not the PrimaryBoss. PrimaryBoss = %s"),
+                *GetName(),
+                PrimaryBoss ? *PrimaryBoss->GetName() : TEXT("NULL"));
         }
     }
 
@@ -117,6 +118,7 @@ void AGuardianLeviathanBoss::GetLifetimeReplicatedProps(TArray< FLifetimePropert
     DOREPLIFETIME(AGuardianLeviathanBoss, CurrentStage);
     DOREPLIFETIME(AGuardianLeviathanBoss, bIsPrimaryBoss);
     DOREPLIFETIME(AGuardianLeviathanBoss, PrimaryBoss);
+
 }
 
 void AGuardianLeviathanBoss::OnRep_CurrentStage()
@@ -168,6 +170,12 @@ void AGuardianLeviathanBoss::OnBossDamaged(float CurrentHealth)
         CurrentStage = 2;
         UE_LOG(LogTemp, Warning, TEXT("Stage 2 started!"));
 
+        // Before finding new hole
+        //if (LastHoleIndex >= 0)
+        //{
+        //    OccupiedHoleIndices.Remove(LastHoleIndex); // allow serpent to go back if needed
+        //}
+
         int32 SpawnIndex = FindAvailableHoleIndex();
         if (SpawnIndex == -1)
         {
@@ -190,15 +198,16 @@ void AGuardianLeviathanBoss::OnBossDamaged(float CurrentHealth)
             NewSerpent->LastHoleIndex = SpawnIndex;
             OccupiedHoleIndices.Add(SpawnIndex);
 
-            NewSerpent->PrimaryBoss = this->PrimaryBoss;
+            //NewSerpent->PrimaryBoss = this->PrimaryBoss;
+            NewSerpent->PrimaryBoss = this;
             NewSerpent->CurrentStage = 2;
+            NewSerpent->bIsPrimaryBoss = false;
             NewSerpent->SetReplicates(true);
             NewSerpent->SetReplicatingMovement(true);
 
             UE_LOG(LogTemp, Warning, TEXT("Second serpent spawned at hole %d"), SpawnIndex);
 
-            // Replicate spawn to clients
-            //Multicast_SpawnSerpent(SpawnHole.Location, SpawnHole.Rotation, 2, SpawnIndex);
+           
         }
     }
     // --- Stage 3 ---
@@ -206,6 +215,12 @@ void AGuardianLeviathanBoss::OnBossDamaged(float CurrentHealth)
     {
         CurrentStage = 3;
         UE_LOG(LogTemp, Warning, TEXT("Stage 3 started!"));
+
+        // Before finding new hole
+        //if (LastHoleIndex >= 0)
+        //{
+        //    OccupiedHoleIndices.Remove(LastHoleIndex); // allow serpent to go back if needed
+        //}
 
         int32 SpawnIndex = FindAvailableHoleIndex();
         if (SpawnIndex == -1)
@@ -229,15 +244,16 @@ void AGuardianLeviathanBoss::OnBossDamaged(float CurrentHealth)
             NewSerpent->LastHoleIndex = SpawnIndex;
             OccupiedHoleIndices.Add(SpawnIndex);
 
-            NewSerpent->PrimaryBoss = this->PrimaryBoss;
+            //NewSerpent->PrimaryBoss = this->PrimaryBoss; MIGHT NEED THIS INSTEAD OF BELOW (THINK EACH FIRE MIGHT BE TRIGGERING ON ALL MEANING EACH FIRE DOES 30 DAMAGE IN STAGE 3). 
+            NewSerpent->PrimaryBoss = this;
             NewSerpent->CurrentStage = 3;
+            NewSerpent->bIsPrimaryBoss = false;
             NewSerpent->SetReplicates(true);
             NewSerpent->SetReplicatingMovement(true);
 
             UE_LOG(LogTemp, Warning, TEXT("Third serpent spawned at hole %d"), SpawnIndex);
 
-            // Replicate spawn to clients
-            //Multicast_SpawnSerpent(SpawnHole.Location, SpawnHole.Rotation, 3, SpawnIndex);
+            
         }
     }
 
@@ -322,7 +338,8 @@ void AGuardianLeviathanBoss::ApplySharedDamage(float Amount)
                 // Destroy the serpent
                 SerpentBoss->Destroy();
 
-                PrimaryBoss = nullptr;
+                //PrimaryBoss = nullptr;
+                //bHasPrimaryBeenAssigned = false;
             }
         }
 
@@ -621,7 +638,7 @@ void AGuardianLeviathanBoss::MoveToNewHole()
     {
         int32 TestIndex = FMath::RandRange(0, HoleTransforms.Num() - 1);
 
-        if (!OccupiedHoleIndices.Contains(TestIndex))
+        if (!OccupiedHoleIndices.Contains(TestIndex) || TestIndex == LastHoleIndex)
         {
             NewIndexSpot = TestIndex;
             break;
@@ -670,7 +687,7 @@ int32 AGuardianLeviathanBoss::FindAvailableHoleIndex()
 
     if (Indices.Num() == 0)
     {
-        return -1; // No free holes
+        return -1;
     }
 
     const int32 RandomIndex = FMath::RandRange(0, Indices.Num() - 1);
@@ -699,32 +716,3 @@ void AGuardianLeviathanBoss::Multicast_OnBossDefeated_Implementation()
 }
 
 
-//void AGuardianLeviathanBoss::Multicast_SpawnSerpent_Implementation(FVector Location, FRotator Rotation, int32 Stage, int32 HoleIndex)
-//{
-//    if (!HasAuthority())
-//    {
-//        FActorSpawnParameters SpawnParams;
-//        SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-//
-//        AGuardianLeviathanBoss* NewSerpent = GetWorld()->SpawnActor<AGuardianLeviathanBoss>(
-//            GetClass(),
-//            Location,
-//            Rotation,
-//            SpawnParams
-//        );
-//
-//        if (NewSerpent)
-//        {
-//            NewSerpent->HoleTransforms = this->HoleTransforms;
-//            NewSerpent->LastHoleIndex = HoleIndex;
-//            OccupiedHoleIndices.Add(HoleIndex);
-//
-//            NewSerpent->PrimaryBoss = this->PrimaryBoss; // Still static but consistent on clients
-//            NewSerpent->CurrentStage = Stage;
-//            NewSerpent->SetReplicates(true);
-//            NewSerpent->SetReplicatingMovement(true);
-//
-//            UE_LOG(LogTemp, Warning, TEXT("Client: Serpent for Stage %d spawned at hole %d"), Stage, HoleIndex);
-//        }
-//    }
-//}

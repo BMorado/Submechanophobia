@@ -67,6 +67,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated)
     bool bIsPrimaryBoss = false;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated)
+    bool bHasPrimaryBeenAssigned = false;
+
     void OnBossDamaged(float);
 
     virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
@@ -135,7 +138,7 @@ public:
     static TArray<int32> OccupiedHoleIndices;
 
     // --- New Hole Transform Setup ---
-    UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Boss|Movement")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Movement")
     TArray<FSpawnHole> HoleTransforms;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Movement")
