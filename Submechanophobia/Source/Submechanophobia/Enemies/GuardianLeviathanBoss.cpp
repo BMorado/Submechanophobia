@@ -1,7 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "GuardianLeviathanBoss.h"
+﻿#include "GuardianLeviathanBoss.h"
 #include "Submechanophobia/Player/APlayerCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Actor.h"
@@ -9,6 +6,7 @@
 #include "AIController.h"
 #include "BrainComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Net/UnrealNetwork.h"
 #include "Blueprint/UserWidget.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
@@ -17,7 +15,7 @@
 //static variables
 float AGuardianLeviathanBoss::SharedHealth = 100.f;
 float AGuardianLeviathanBoss::MaxSharedHealth = 100.f;
-AGuardianLeviathanBoss* AGuardianLeviathanBoss::PrimaryBoss = nullptr;
+//AGuardianLeviathanBoss* AGuardianLeviathanBoss::PrimaryBoss = nullptr;
 TArray<int32> AGuardianLeviathanBoss::OccupiedHoleIndices;
 
 AGuardianLeviathanBoss::AGuardianLeviathanBoss()
@@ -32,38 +30,61 @@ AGuardianLeviathanBoss::AGuardianLeviathanBoss()
     HealthComponent->SetMaxHealth(100.0f);
     HealthComponent->SetHealth(HealthComponent->GetMaxHealth());
 
-   
+
     //Mesh and Anim BP assignment should happen in the Blueprint for flexibility.
     FireDamageHitbox = CreateDefaultSubobject<UCapsuleComponent>(TEXT("FireDamageHitbox"));
     FireDamageHitbox->SetupAttachment(RootComponent);
     FireDamageHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     FireDamageHitbox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
     FireDamageHitbox->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);
+
+    bReplicates = true;
+    SetReplicatingMovement(true);
 }
+
 
 void AGuardianLeviathanBoss::BeginPlay()
 {
     Super::BeginPlay();
-    
-    // Ensure clean state on play start
-    if (!bIsPrimaryBoss)
+
+   
+    if (HasAuthority())
     {
-        PrimaryBoss = nullptr;
+        TArray<AActor*> FoundBosses;
+        UGameplayStatics::GetAllActorsOfClass(GetWorld(), AGuardianLeviathanBoss::StaticClass(), FoundBosses);
+
+        if (FoundBosses.Num() == 1) // First one spawned
+        {
+            bIsPrimaryBoss = true;
+            PrimaryBoss = this;
+            SharedHealth = MaxSharedHealth;
+            UE_LOG(LogTemp, Warning, TEXT("[Primary Assigned] %s is the PrimaryBoss."), *GetName());
+        }
+        else
+        {
+            bIsPrimaryBoss = false;
+            PrimaryBoss = Cast<AGuardianLeviathanBoss>(FoundBosses[0]); // Assume the first one is still valid
+            UE_LOG(LogTemp, Warning, TEXT("[Secondary Spawned] %s is not the PrimaryBoss. PrimaryBoss = %s"),
+                *GetName(),
+                PrimaryBoss ? *PrimaryBoss->GetName() : TEXT("NULL"));
+        }
     }
 
-    if (!PrimaryBoss)
+    // Optional: Debug info
+    UE_LOG(LogTemp, Warning, TEXT("BeginPlay: %s - isPrimary: %s - HasAuthority: %s"), *GetName(),
+        bIsPrimaryBoss ? TEXT("true") : TEXT("false"),
+        HasAuthority() ? TEXT("true") : TEXT("false"));
+
+    if (HasAuthority())
     {
-        PrimaryBoss = this; // First one becomes the one that handles stage logic
-        SharedHealth = MaxSharedHealth;
-    }
-    
-    AAIController* AIController = Cast<AAIController>(GetController());
-    if (AIController)
-    {
-        UBlackboardComponent* BlackboardComp = AIController->GetBlackboardComponent();
-        if (BlackboardComp)
+        AAIController* AIController = Cast<AAIController>(GetController());
+        if (AIController)
         {
-            BlackboardComp->SetValueAsInt(FName("CurrentStage"), CurrentStage); // default = 1, after should follow what is set (when second serpent is created CurrentStage = 2)
+            UBlackboardComponent* BlackboardComp = AIController->GetBlackboardComponent();
+            if (BlackboardComp)
+            {
+                BlackboardComp->SetValueAsInt(FName("CurrentStage"), CurrentStage);
+            }
         }
     }
 
@@ -82,13 +103,35 @@ void AGuardianLeviathanBoss::BeginPlay()
         }
     }
 
-    if (!FlameEffect1 || !FlameEffect2)
-    {
-        UE_LOG(LogTemp, Error, TEXT("FlameEffect Niagara Components are not initialized!"));
-    }
 
-    ReplicatedSharedHealth = SharedHealth;
- 
+}
+
+void AGuardianLeviathanBoss::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    //DOREPLIFETIME(AGuardianLeviathanBoss, FlameEffect1);
+    //DOREPLIFETIME(AGuardianLeviathanBoss, FlameEffect2);
+    DOREPLIFETIME(AGuardianLeviathanBoss, FireMontage);
+    DOREPLIFETIME(AGuardianLeviathanBoss, TransitionMontage);
+    DOREPLIFETIME(AGuardianLeviathanBoss, ReplicatedSharedHealth);
+    DOREPLIFETIME(AGuardianLeviathanBoss, CurrentStage);
+    DOREPLIFETIME(AGuardianLeviathanBoss, bIsPrimaryBoss);
+    DOREPLIFETIME(AGuardianLeviathanBoss, PrimaryBoss);
+
+}
+
+void AGuardianLeviathanBoss::OnRep_CurrentStage()
+{
+    AAIController* AIController = Cast<AAIController>(GetController());
+    if (AIController)
+    {
+        UBlackboardComponent* BlackboardComp = AIController->GetBlackboardComponent();
+        if (BlackboardComp)
+        {
+            BlackboardComp->SetValueAsInt(FName("CurrentStage"), CurrentStage);
+        }
+    }
 }
 
 void AGuardianLeviathanBoss::EnterNextStage()
@@ -96,39 +139,272 @@ void AGuardianLeviathanBoss::EnterNextStage()
     CurrentStage++;
 }
 
+void AGuardianLeviathanBoss::OnRep_SharedHealth()
+{
+    // Keep the static in sync across all instances
+    SharedHealth = ReplicatedSharedHealth;
+
+    UE_LOG(LogTemp, Warning, TEXT("OnRep_SharedHealth triggered. Updated SharedHealth to %.2f"), SharedHealth);
+
+    // Optional: trigger animations, VFX, sounds here if health drops at thresholds
+    OnBossDamaged(SharedHealth);
+}
+
+void AGuardianLeviathanBoss::OnBossDamaged(float CurrentHealth)
+{
+    if (!HasAuthority() || !PrimaryBoss) return;
+
+    UWorld* World = GetWorld();
+    if (!World || HoleTransforms.Num() == 0) return;
+
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+    SpawnParams.Owner = this;
+    SpawnParams.Instigator = GetInstigator();
+    SpawnParams.bNoFail = true;
+    SpawnParams.bDeferConstruction = false;
+
+    // --- Stage 2 ---
+    if (CurrentStage == 1 && CurrentHealth <= 66.f)
+    {
+        CurrentStage = 2;
+        UE_LOG(LogTemp, Warning, TEXT("Stage 2 started!"));
+
+        // Before finding new hole
+        //if (LastHoleIndex >= 0)
+        //{
+        //    OccupiedHoleIndices.Remove(LastHoleIndex); // allow serpent to go back if needed
+        //}
+
+        int32 SpawnIndex = FindAvailableHoleIndex();
+        if (SpawnIndex == -1)
+        {
+            UE_LOG(LogTemp, Error, TEXT("No free holes available for spawning second serpent."));
+            return;
+        }
+
+        const FSpawnHole& SpawnHole = HoleTransforms[SpawnIndex];
+
+        AGuardianLeviathanBoss* NewSerpent = World->SpawnActor<AGuardianLeviathanBoss>(
+            GetClass(),
+            SpawnHole.Location,
+            SpawnHole.Rotation,
+            SpawnParams
+        );
+
+        if (NewSerpent)
+        {
+            NewSerpent->HoleTransforms = this->HoleTransforms;
+            NewSerpent->LastHoleIndex = SpawnIndex;
+            OccupiedHoleIndices.Add(SpawnIndex);
+
+            //NewSerpent->PrimaryBoss = this->PrimaryBoss;
+            NewSerpent->PrimaryBoss = this;
+            NewSerpent->CurrentStage = 2;
+            NewSerpent->bIsPrimaryBoss = false;
+            NewSerpent->SetReplicates(true);
+            NewSerpent->SetReplicatingMovement(true);
+
+            UE_LOG(LogTemp, Warning, TEXT("Second serpent spawned at hole %d"), SpawnIndex);
+
+           
+        }
+    }
+    // --- Stage 3 ---
+    else if (CurrentStage == 2 && CurrentHealth <= 33.f)
+    {
+        CurrentStage = 3;
+        UE_LOG(LogTemp, Warning, TEXT("Stage 3 started!"));
+
+        // Before finding new hole
+        //if (LastHoleIndex >= 0)
+        //{
+        //    OccupiedHoleIndices.Remove(LastHoleIndex); // allow serpent to go back if needed
+        //}
+
+        int32 SpawnIndex = FindAvailableHoleIndex();
+        if (SpawnIndex == -1)
+        {
+            UE_LOG(LogTemp, Error, TEXT("No free holes available for spawning third serpent."));
+            return;
+        }
+
+        const FSpawnHole& SpawnHole = HoleTransforms[SpawnIndex];
+
+        AGuardianLeviathanBoss* NewSerpent = World->SpawnActor<AGuardianLeviathanBoss>(
+            GetClass(),
+            SpawnHole.Location,
+            SpawnHole.Rotation,
+            SpawnParams
+        );
+
+        if (NewSerpent)
+        {
+            NewSerpent->HoleTransforms = this->HoleTransforms;
+            NewSerpent->LastHoleIndex = SpawnIndex;
+            OccupiedHoleIndices.Add(SpawnIndex);
+
+            //NewSerpent->PrimaryBoss = this->PrimaryBoss; MIGHT NEED THIS INSTEAD OF BELOW (THINK EACH FIRE MIGHT BE TRIGGERING ON ALL MEANING EACH FIRE DOES 30 DAMAGE IN STAGE 3). 
+            NewSerpent->PrimaryBoss = this;
+            NewSerpent->CurrentStage = 3;
+            NewSerpent->bIsPrimaryBoss = false;
+            NewSerpent->SetReplicates(true);
+            NewSerpent->SetReplicatingMovement(true);
+
+            UE_LOG(LogTemp, Warning, TEXT("Third serpent spawned at hole %d"), SpawnIndex);
+
+            
+        }
+    }
+
+    // --- Blackboard Update ---
+    AAIController* AIController = Cast<AAIController>(GetController());
+    if (AIController)
+    {
+        UBlackboardComponent* BlackboardComp = AIController->GetBlackboardComponent();
+        if (BlackboardComp)
+        {
+            BlackboardComp->SetValueAsInt(FName("CurrentStage"), CurrentStage);
+        }
+    }
+}
+
+
+float AGuardianLeviathanBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
+    AController* EventInstigator, AActor* DamageCauser)
+{
+    if (HealthComponent)
+    {
+        HealthComponent->TakeDamage(DamageAmount);
+
+        float CurrentHealth = HealthComponent->GetCurrentHealth();
+
+        // Call stage logic
+        OnBossDamaged(CurrentHealth);
+
+    }
+
+    return DamageAmount;
+}
+
+void AGuardianLeviathanBoss::ApplySharedDamage(float Amount)
+{
+    if (!IsValid(this) || this->IsActorBeingDestroyed())
+    {
+        UE_LOG(LogTemp, Error, TEXT("This serpent is invalid or pending kill!"));
+        return;
+    }
+
+    if (!IsValid(PrimaryBoss))
+    {
+        UE_LOG(LogTemp, Error, TEXT("ApplySharedDamage: PrimaryBoss is invalid or destroyed!"));
+        return;
+    }
+
+    SharedHealth -= Amount;
+    SharedHealth = FMath::Clamp(SharedHealth, 0.f, MaxSharedHealth);
+    ReplicatedSharedHealth = SharedHealth;
+
+    UE_LOG(LogTemp, Warning, TEXT("[Shared Damage] Applied %.2f — Current: %.2f"), Amount, SharedHealth);
+
+    UWorld* World = PrimaryBoss->GetWorld();
+
+    if (SharedHealth <= 0.f)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Boss defeated — shared health depleted."));
+
+        // Clean up all serpents
+        TArray<AActor*> FoundSerpents;
+        UGameplayStatics::GetAllActorsOfClass(World, AGuardianLeviathanBoss::StaticClass(), FoundSerpents);
+
+        for (AActor* Serpent : FoundSerpents)
+        {
+            AGuardianLeviathanBoss* SerpentBoss = Cast<AGuardianLeviathanBoss>(Serpent);
+            if (SerpentBoss)
+            {
+                // Stop Behavior Tree cleanly
+                AAIController* AIController = Cast<AAIController>(SerpentBoss->GetController());
+                if (AIController && AIController->BrainComponent)
+                {
+                    AIController->BrainComponent->StopLogic("Boss defeated");
+                }
+
+                // Free up the hole index
+                if (SerpentBoss->LastHoleIndex >= 0)
+                {
+                    OccupiedHoleIndices.Remove(SerpentBoss->LastHoleIndex);
+                }
+
+                // Destroy the serpent
+                SerpentBoss->Destroy();
+
+                //PrimaryBoss = nullptr;
+                //bHasPrimaryBeenAssigned = false;
+            }
+        }
+
+        OccupiedHoleIndices.Empty(); // Clear tracking list
+
+        //add  widgets to all players
+        Multicast_OnBossDefeated();
+
+    }
+    if (PrimaryBoss)
+    {
+        PrimaryBoss->OnBossDamaged(SharedHealth);
+    }
+
+}
+
 void AGuardianLeviathanBoss::FireAttack()
 {
-    
-    USkeletalMeshComponent* Mesh = FindComponentByClass<USkeletalMeshComponent>();
-    if (!Mesh) return;
 
-    UAnimInstance* Anim = Mesh->GetAnimInstance();
-    if (!Anim || !FireMontage) return;
+    if (HasAuthority())
+    {
+        Server_FireAttack();
+    }
+    else
+    {
+        Server_FireAttack(); // Clients will call the server
+    }
+}
 
-    Anim->Montage_Play(FireMontage);
-
-    // SERVER-ONLY visual activation
-    if (FlameEffect1) FlameEffect1->Activate();
-    if (FlameEffect2) FlameEffect2->Activate();
-    // this will trigger onRep
-    //bShouldPlayFireVFX = true;
-    
-
-    //USED FOR TESTING
+void AGuardianLeviathanBoss::Server_FireAttack_Implementation()
+{
+    // Core logic stays server-side
     ApplySharedDamage(10.f);
-    if (HealthComponent) { HealthComponent->TakeDamage(10.f); }
-
-    UE_LOG(LogTemp, Warning, TEXT("Boss current shared health: %.2f"), GetSharedHealth());
-    // === END TEST ===
-
+    
     if (FireDamageHitbox)
     {
         FireDamageHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     }
 
-    // Start damage over time
     GetWorldTimerManager().SetTimer(FireTimerHandle, this, &AGuardianLeviathanBoss::ApplyFireDamage, 0.5f, true, 0.0f);
     GetWorldTimerManager().SetTimer(StopFireHandle, this, &AGuardianLeviathanBoss::StopFireBreath, 5.0f, false);
+
+    // Broadcast effects to everyone
+    Multicast_PlayFireAttack();
+}
+
+void AGuardianLeviathanBoss::Multicast_PlayFireAttack_Implementation()
+{
+    UE_LOG(LogTemp, Warning, TEXT("Multicast_PlayFireAttack called on %s. HasAuthority: %s, Role: %d"),
+        *GetName(),
+        HasAuthority() ? TEXT("true") : TEXT("false"),
+        (int32)GetLocalRole());
+
+    USkeletalMeshComponent* Mesh = FindComponentByClass<USkeletalMeshComponent>();
+    if (!Mesh || !FireMontage) return;
+
+    UAnimInstance* Anim = Mesh->GetAnimInstance();
+    if (!Anim) return;
+
+    Anim->Montage_Play(FireMontage);
+
+    if (FlameEffect1) FlameEffect1->Activate();
+    if (FlameEffect2) FlameEffect2->Activate();
+
+    UE_LOG(LogTemp, Warning, TEXT("Multicast_PlayFireAttack called on %s"), *GetName());
 }
 
 void AGuardianLeviathanBoss::ApplyFireDamage()
@@ -153,19 +429,12 @@ void AGuardianLeviathanBoss::ApplyFireDamage()
 
 void AGuardianLeviathanBoss::StopFireBreath()
 {
-
-    //// SERVER deactivates directly
     if (FlameEffect1) FlameEffect1->Deactivate();
     if (FlameEffect2) FlameEffect2->Deactivate();
-    //bShouldStopFireVFX = true;
-    
 
     FireDamageHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
     GetWorldTimerManager().ClearTimer(FireTimerHandle);
-    
-    /*bShouldPlayFireVFX = false;
-    bShouldStopFireVFX = false;*/
 }
 
 void AGuardianLeviathanBoss::ApplyScreechDamage()
@@ -283,15 +552,30 @@ void AGuardianLeviathanBoss::LungeAttack()
 
 void AGuardianLeviathanBoss::TransitionOut()
 {
-    /*if (!TransitionMontage) return;
+    if (HasAuthority())
+    {
+        Multicast_PlayTransitionOut();
+    }
+
+}
+
+void AGuardianLeviathanBoss::Multicast_PlayTransitionOut_Implementation()
+{
+    UE_LOG(LogTemp, Warning, TEXT("[Multicast_PlayTransitionOut] Called on %s - HasAuthority: %s, Role: %d"),
+        *GetName(),
+        HasAuthority() ? TEXT("true") : TEXT("false"),
+        (int32)GetLocalRole());
+
+    UE_LOG(LogTemp, Warning, TEXT("TransitionMontage is %s on %s"),
+        TransitionMontage ? TEXT("VALID") : TEXT("NULL"),
+        *GetName());
+
+    if (!TransitionMontage || !enemyMesh) return;
+
+    UE_LOG(LogTemp, Warning, TEXT("Multicast_PlayTransitionOut on %s"), *GetName());
 
     UAnimInstance* Anim = enemyMesh->GetAnimInstance();
-    if (!Anim) return;*/
-    USkeletalMeshComponent* Mesh = FindComponentByClass<USkeletalMeshComponent>();
-    if (!Mesh) return;
-
-    UAnimInstance* Anim = Mesh->GetAnimInstance();
-    if (!Anim || !TransitionMontage) return;
+    if (!Anim) return;
 
     Anim->Montage_Play(TransitionMontage);
 
@@ -299,16 +583,36 @@ void AGuardianLeviathanBoss::TransitionOut()
 
 void AGuardianLeviathanBoss::PlayTransitionIn()
 {
+    if (HasAuthority())
+    {
+        Multicast_PlayTransitionIn();
+    }
+}
+
+void AGuardianLeviathanBoss::Multicast_PlayTransitionIn_Implementation()
+{
+    UE_LOG(LogTemp, Warning, TEXT("[Multicast_PlayTransitionIn] Called on %s - HasAuthority: %s, Role: %d"),
+        *GetName(),
+        HasAuthority() ? TEXT("true") : TEXT("false"),
+        (int32)GetLocalRole());
+
+    UE_LOG(LogTemp, Warning, TEXT("TransitionMontage is %s on %s"),
+        TransitionMontage ? TEXT("VALID") : TEXT("NULL"),
+        *GetName());
+    
     if (!TransitionMontage || !enemyMesh) return;
 
-    UE_LOG(LogTemp, Warning, TEXT("Boss playing Transition IN (reverse)"));
+    UE_LOG(LogTemp, Warning, TEXT("Multicast_PlayTransitionIn on %s"), *GetName());
 
     UAnimInstance* Anim = enemyMesh->GetAnimInstance();
     if (!Anim) return;
 
-    Anim->Montage_Play(TransitionMontage, 1.0f);
-    Anim->Montage_SetPlayRate(TransitionMontage, -1.0f);
-    Anim->Montage_JumpToSection(FName("Default"), TransitionMontage); // or any known section/end
+    const float MontageLength = TransitionMontage->GetPlayLength();
+
+    // Ensure the animation starts at the end and plays backward
+    Anim->Montage_Play(TransitionMontage, -1.0f);
+    Anim->Montage_SetPosition(TransitionMontage, MontageLength);
+
 }
 
 void AGuardianLeviathanBoss::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
@@ -318,7 +622,14 @@ void AGuardianLeviathanBoss::OnMontageEnded(UAnimMontage* Montage, bool bInterru
 
 void AGuardianLeviathanBoss::MoveToNewHole()
 {
-    if (HoleTransforms.Num() == 0) return;
+    //prevent client from running
+    if (!HasAuthority()) return;
+
+    if (HoleTransforms.Num() == 0)
+    {
+        UE_LOG(LogTemp, Error, TEXT("HoleTransforms is empty! Cannot move."));
+        return;
+    }
 
     int32 NewIndexSpot = -1;
     int32 Attempts = 10; // safety cap
@@ -327,14 +638,18 @@ void AGuardianLeviathanBoss::MoveToNewHole()
     {
         int32 TestIndex = FMath::RandRange(0, HoleTransforms.Num() - 1);
 
-        if (!OccupiedHoleIndices.Contains(TestIndex))
+        if (!OccupiedHoleIndices.Contains(TestIndex) || TestIndex == LastHoleIndex)
         {
             NewIndexSpot = TestIndex;
             break;
         }
     }
 
-    if (NewIndexSpot == -1) return; // Failed to find a valid hole
+    if (NewIndexSpot == -1)
+    {
+        UE_LOG(LogTemp, Error, TEXT("No available hole found after retries."));
+        return;
+    }
 
     if (LastHoleIndex >= 0)
     {
@@ -349,200 +664,7 @@ void AGuardianLeviathanBoss::MoveToNewHole()
     SetActorLocationAndRotation(Target.Location, Target.Rotation);
 }
 
-void AGuardianLeviathanBoss::OnBossDamaged(float CurrentHealth)
-{
-   
-    if (!PrimaryBoss) return;
 
-    UWorld* World = GetWorld();
-    if (!World || HoleTransforms.Num() == 0) return;
-
-    FActorSpawnParameters SpawnParams;
-    SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-    // --- Stage 2 ---
-    if (CurrentStage == 1 && CurrentHealth <= 66.f)
-    {
-        CurrentStage = 2;
-        UE_LOG(LogTemp, Warning, TEXT("Stage 2 started!"));
-
-        int32 SpawnIndex = FindAvailableHoleIndex();
-        if (SpawnIndex == -1)
-        {
-            UE_LOG(LogTemp, Error, TEXT("No free holes available for spawning second serpent."));
-            return;
-        }
-
-        const FSpawnHole& SpawnHole = HoleTransforms[SpawnIndex];
-
-        AGuardianLeviathanBoss* NewSerpent = World->SpawnActor<AGuardianLeviathanBoss>(
-            GetClass(),
-            SpawnHole.Location,
-            SpawnHole.Rotation,
-            SpawnParams
-        );
-
-        if (NewSerpent)
-        {
-            NewSerpent->HoleTransforms = this->HoleTransforms;
-            NewSerpent->LastHoleIndex = SpawnIndex;
-            OccupiedHoleIndices.Add(SpawnIndex);
-
-            NewSerpent->PrimaryBoss = this->PrimaryBoss;
-            NewSerpent->CurrentStage = 2;
-
-            UE_LOG(LogTemp, Warning, TEXT("Second serpent spawned at hole %d"), SpawnIndex);
-        }
-    }
-
-    // --- Stage 3 ---
-    else if (CurrentStage == 2 && CurrentHealth <= 33.f)
-    {
-        CurrentStage = 3;
-        UE_LOG(LogTemp, Warning, TEXT("Stage 3 started!"));
-
-        int32 SpawnIndex = FindAvailableHoleIndex();
-        if (SpawnIndex == -1)
-        {
-            UE_LOG(LogTemp, Error, TEXT("No free holes available for spawning third serpent."));
-            return;
-        }
-
-        const FSpawnHole& SpawnHole = HoleTransforms[SpawnIndex];
-
-        AGuardianLeviathanBoss* NewSerpent = World->SpawnActor<AGuardianLeviathanBoss>(
-            GetClass(),
-            SpawnHole.Location,
-            SpawnHole.Rotation,
-            SpawnParams
-        );
-
-        if (NewSerpent)
-        {
-            NewSerpent->HoleTransforms = this->HoleTransforms;
-            NewSerpent->LastHoleIndex = SpawnIndex;
-            OccupiedHoleIndices.Add(SpawnIndex);
-
-            NewSerpent->PrimaryBoss = this->PrimaryBoss;
-            NewSerpent->CurrentStage = 3;
-
-            UE_LOG(LogTemp, Warning, TEXT("Third serpent spawned at hole %d"), SpawnIndex);
-        }
-    }
-
-    // --- Blackboard Update ---
-    AAIController* AIController = Cast<AAIController>(GetController());
-    if (AIController)
-    {
-        UBlackboardComponent* BlackboardComp = AIController->GetBlackboardComponent();
-        if (BlackboardComp)
-        {
-            BlackboardComp->SetValueAsInt(FName("CurrentStage"), CurrentStage);
-        }
-    }
-}
-
-
-float AGuardianLeviathanBoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
-    AController* EventInstigator, AActor* DamageCauser)
-{
-    if (HealthComponent)
-    {
-        HealthComponent->TakeDamage(DamageAmount);
-
-        float CurrentHealth = HealthComponent->GetCurrentHealth();
-        ReplicatedSharedHealth = SharedHealth;
-
-        // Call stage logic
-        OnBossDamaged(CurrentHealth);
-
-    }
-
-    return DamageAmount;
-}
-
-void AGuardianLeviathanBoss::ApplySharedDamage(float Amount)
-{
-    if (!IsValid(this) || this->IsActorBeingDestroyed())
-    {
-        UE_LOG(LogTemp, Error, TEXT("This serpent is invalid or pending kill!"));
-        return;
-    }
-
-    if (!IsValid(PrimaryBoss))
-    {
-        UE_LOG(LogTemp, Error, TEXT("ApplySharedDamage: PrimaryBoss is invalid or destroyed!"));
-        return;
-    }
-
-    SharedHealth -= Amount;
-    SharedHealth = FMath::Clamp(SharedHealth, 0.f, MaxSharedHealth);
-
-    UE_LOG(LogTemp, Warning, TEXT("[Shared Damage] Applied %.2f — Current: %.2f"), Amount, SharedHealth);
-
-    UWorld* World = PrimaryBoss->GetWorld();
-
-    if (SharedHealth <= 0.f)
-    {
-       UE_LOG(LogTemp, Warning, TEXT("Boss defeated — shared health depleted."));
-
-      // Clean up all serpents
-       TArray<AActor*> FoundSerpents;
-       UGameplayStatics::GetAllActorsOfClass(World, AGuardianLeviathanBoss::StaticClass(), FoundSerpents);
-
-       for (AActor* Serpent : FoundSerpents)
-       {
-           AGuardianLeviathanBoss* SerpentBoss = Cast<AGuardianLeviathanBoss>(Serpent);
-           if (SerpentBoss)
-           {
-               // Stop Behavior Tree cleanly
-               AAIController* AIController = Cast<AAIController>(SerpentBoss->GetController());
-               if (AIController && AIController->BrainComponent)
-               {
-                   AIController->BrainComponent->StopLogic("Boss defeated");
-               }
-
-               // Free up the hole index
-               if (SerpentBoss->LastHoleIndex >= 0)
-               {
-                   OccupiedHoleIndices.Remove(SerpentBoss->LastHoleIndex);
-               }
-
-               // Destroy the serpent
-               SerpentBoss->Destroy();
-
-               PrimaryBoss = nullptr;
-           }
-       }
-
-       OccupiedHoleIndices.Empty(); // Clear tracking list
-
-       // 👇 Add Win Widget and disable player control
-       APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
-       if (PC)
-       {
-           PC->SetIgnoreMoveInput(true);
-           PC->SetIgnoreLookInput(true);
-           PC->bShowMouseCursor = true;
-           PC->SetInputMode(FInputModeUIOnly());
-
-           if (WinWidgetClass) // ← UPROPERTY for the Widget
-           {
-               UUserWidget* WinWidget = CreateWidget<UUserWidget>(PC, WinWidgetClass);
-               if (WinWidget)
-               {
-                   WinWidget->AddToViewport();
-               }
-           }
-       }
-
-    }
-    if (PrimaryBoss)
-    {
-        PrimaryBoss->OnBossDamaged(SharedHealth);
-    }
-   
-}
 
 float AGuardianLeviathanBoss::GetSharedHealth()
 {
@@ -565,49 +687,32 @@ int32 AGuardianLeviathanBoss::FindAvailableHoleIndex()
 
     if (Indices.Num() == 0)
     {
-        return -1; // No free holes
+        return -1;
     }
 
     const int32 RandomIndex = FMath::RandRange(0, Indices.Num() - 1);
     return Indices[RandomIndex];
 }
 
-void AGuardianLeviathanBoss::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void AGuardianLeviathanBoss::Multicast_OnBossDefeated_Implementation()
 {
-    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+    APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+    if (PC)
+    {
+        PC->SetIgnoreMoveInput(true);
+        PC->SetIgnoreLookInput(true);
+        PC->bShowMouseCursor = true;
+        PC->SetInputMode(FInputModeUIOnly());
 
-    DOREPLIFETIME(AGuardianLeviathanBoss, CurrentStage);
-    DOREPLIFETIME(AGuardianLeviathanBoss, bIsPrimaryBoss);
-    DOREPLIFETIME(AGuardianLeviathanBoss, ReplicatedSharedHealth);
-    /*DOREPLIFETIME(AGuardianLeviathanBoss, bShouldPlayFireVFX);
-    DOREPLIFETIME(AGuardianLeviathanBoss, bShouldStopFireVFX);*/
+        if (WinWidgetClass)
+        {
+            UUserWidget* WinWidget = CreateWidget<UUserWidget>(PC, WinWidgetClass);
+            if (WinWidget)
+            {
+                WinWidget->AddToViewport();
+            }
+        }
+    }
 }
 
-void AGuardianLeviathanBoss::OnRep_SharedHealth()
-{
-    SharedHealth = ReplicatedSharedHealth;
-    UE_LOG(LogTemp, Log, TEXT("[Client] SharedHealth replicated: %.2f"), SharedHealth);
-}
 
-
-//void AGuardianLeviathanBoss::OnRep_PlayFireVFX()
-//{
-//    if (HasAuthority()) return; // Avoid activating twice on server
-//
-//    if (FlameEffect1 && FlameEffect1->IsRegistered())
-//        FlameEffect1->Activate();
-//
-//    if (FlameEffect2 && FlameEffect2->IsRegistered())
-//        FlameEffect2->Activate();
-//}
-//
-//void AGuardianLeviathanBoss::OnRep_StopFireVFX()
-//{
-//    if (HasAuthority()) return; // Server already did this
-//
-//    if (FlameEffect1 && FlameEffect1->IsRegistered())
-//        FlameEffect1->Deactivate();
-//
-//    if (FlameEffect2 && FlameEffect2->IsRegistered())
-//        FlameEffect2->Deactivate();
-//}
