@@ -83,10 +83,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Replicated, Category = "gameplay");
 	AUWeaponBase* SecondaryWeapon; 
 
-	
+	UPROPERTY(ReplicatedUsing = OnRep_ControlRotation)
+	FRotator ReplicatedControlRotation;
 
-	bool canShoot = true; 
+	bool canShoot = true;
 	
+	UFUNCTION()
+	void OnRep_ControlRotation();
 	
 	void StartJump();
 	void StopJump();
@@ -109,8 +112,9 @@ protected:
 	
 	void WeaponFireDelay(); 
 
+	void TestLook(const FInputActionValue& Value); 
 	
-	void RayCast();
+	void RayCast(FRotator AimRotation);
 
 
 	
@@ -126,20 +130,16 @@ protected:
 	UFUNCTION(NetMulticast,Reliable)
 	void NetMulticast_EquipPrimary();
 
-
-
-
+	UFUNCTION(Server, Reliable)
+	void Server_UpdateLookRotation(FRotator NewControlRotation);
 
 	UFUNCTION(Server,Reliable)
-	void RPC_FireWeapon(); 
+	void RPC_FireWeapon(FRotator AimRotation); 
 
 	UFUNCTION(NetMulticast,Reliable)
-	void Muticast_FireWeapon();
-
-
-
-
-
+	void Muticast_FireWeapon(FRotator AimRotation);
+	
+	
 	UFUNCTION(Server,Reliable)
 	void RPC_Reload(); 
 
@@ -149,6 +149,7 @@ protected:
 	
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };
+
 
 
 

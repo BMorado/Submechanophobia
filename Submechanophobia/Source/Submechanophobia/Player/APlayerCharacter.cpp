@@ -24,6 +24,7 @@ AAPlayerCharacter::AAPlayerCharacter()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Player Camera"));
 	Camera->SetupAttachment(GetCapsuleComponent());
 	Camera->bUsePawnControlRotation = true;
+	
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationPitch = true;
 	bUseControllerRotationRoll = false;
@@ -89,6 +90,11 @@ AUWeaponBase* AAPlayerCharacter::GetCurrentWeapon()
 }
 
 
+void AAPlayerCharacter::OnRep_ControlRotation()
+{
+	Camera->SetWorldRotation(ReplicatedControlRotation);
+}
+
 void AAPlayerCharacter::StartJump()
 {
 	bPressedJump = true;
@@ -115,16 +121,23 @@ void AAPlayerCharacter::Move(const FInputActionValue& Value)
 }
 
 
+
+
 void AAPlayerCharacter::Look(const FInputActionValue& Value)
 {
-	const FVector2D LookValue = Value.Get<FVector2D>();
+	if (!IsLocallyControlled()) return;
 
+	FVector2D LookValue = Value.Get<FVector2D>();
 	AddControllerYawInput(LookValue.X);
 	AddControllerPitchInput(LookValue.Y);
+
+	Server_UpdateLookRotation(GetControlRotation());
 }
 
-
-
+void AAPlayerCharacter::Server_UpdateLookRotation_Implementation(FRotator NewControlRotation)
+{
+	ReplicatedControlRotation = NewControlRotation;
+}
 void AAPlayerCharacter::FireWeapon()
 {
 	
@@ -134,21 +147,21 @@ void AAPlayerCharacter::FireWeapon()
 	// 	else{RPC_FireWeapon();}
 	// }
 
-	if (HasAuthority()){Muticast_FireWeapon();}
-	 	else{RPC_FireWeapon();}
+	if (HasAuthority()){Muticast_FireWeapon(GetControlRotation());}
+	 	else{RPC_FireWeapon(GetControlRotation());}
 	
 }
 
- void AAPlayerCharacter::RPC_FireWeapon_Implementation()
+ void AAPlayerCharacter::RPC_FireWeapon_Implementation(FRotator AimRotation)
 {
-	Muticast_FireWeapon(); 
+	Muticast_FireWeapon( AimRotation); 
 }
 
 
-void AAPlayerCharacter::Muticast_FireWeapon_Implementation()
+void AAPlayerCharacter::Muticast_FireWeapon_Implementation(FRotator AimRotation)
 {
 
-	RayCast();
+	RayCast( AimRotation);
 }
 
 
@@ -158,6 +171,13 @@ void AAPlayerCharacter::WeaponFireDelay()
 	canShoot = true ; 
 }
 
+void AAPlayerCharacter::TestLook(const FInputActionValue& Value)
+{
+	const FVector2D LookValue = Value.Get<FVector2D>();
+
+	AddControllerYawInput(LookValue.X);
+	AddControllerPitchInput(LookValue.Y);
+}
 
 
 //hides secondary weapon, makes primary weapon visible then sets primary to current weapon
@@ -223,13 +243,13 @@ void AAPlayerCharacter::Reload()
 
 
 
-void  AAPlayerCharacter::RayCast()
+void  AAPlayerCharacter::RayCast(FRotator AimRotation)
 {
 	if (currentWeapon != nullptr && currentWeapon->magazineAmmo > 0 && canShoot){
 		canShoot = false;
 	
 		FVector StartTrace = Camera->GetComponentLocation();
-		FVector ForwardVector = Camera->GetForwardVector();
+		FVector ForwardVector = AimRotation.Vector();
 		FVector offset = FMath::VRand() * 2.0f;
 		FHitResult HitResult;
 		FVector EndTrace = (currentWeapon->bulletSpread + ForwardVector * 5000.f) + StartTrace;
@@ -249,6 +269,7 @@ void  AAPlayerCharacter::RayCast()
 	}
 	
 }
+
 
 
 void AAPlayerCharacter::RPC_EquipPrimary_Implementation()
@@ -303,7 +324,7 @@ void AAPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(AAPlayerCharacter, SecondaryWeapon); // or whatever your variable is
 
 	DOREPLIFETIME(AAPlayerCharacter, Camera); // or whatever your variable is
-
+	DOREPLIFETIME(AAPlayerCharacter, ReplicatedControlRotation);
 }
 
 
