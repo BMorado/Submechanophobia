@@ -30,7 +30,7 @@ AEnemy::AEnemy()
 	
 	// Displays the collider in The editor and game
 	
-	CapsuleComponent->SetVisibility(true);
+	CapsuleComponent->SetVisibility(false);
 	CapsuleComponent->ShapeColor = FColor::Green;
 
 	// Setup Health Component
