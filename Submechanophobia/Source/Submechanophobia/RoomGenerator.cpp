@@ -28,11 +28,12 @@ void ARoomGenerator::BeginPlay()
 	// After all the puzzle rooms are spawned fill all the leftover spawn points with the default type room
 	for (const AActor* list : spawnPointsList)
 	{
+		int RandInt = FMath::RandRange(0,defaultRoom.Num()-1);
 		FVector TempLocation = list->GetActorLocation();
 		FRotator TempRotation = list->GetActorRotation();
 		UE_LOG(LogTemp, Log, TEXT("%f"),TempRotation.Yaw);
 		
-		World->SpawnActor<AActor>(defaultRoom,TempLocation, TempRotation);
+		World->SpawnActor<APuzzle>(defaultRoom[RandInt],TempLocation, TempRotation);
 	}
 	
 }

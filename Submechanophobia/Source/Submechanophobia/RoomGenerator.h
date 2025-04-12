@@ -50,7 +50,7 @@ protected:
 
 	// Room used to fill all empty spaces after all puzzle rooms are spawned 
 	UPROPERTY(EditAnywhere, Category="Spawning")
-	TSubclassOf<AActor> defaultRoom;
+	TArray<TSubclassOf<APuzzle>> defaultRoom;
 
 	// Array of the puzzle that have been spawned
 	UPROPERTY()
