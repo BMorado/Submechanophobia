@@ -8,7 +8,6 @@
 #include "Submechanophobia/Weapons/WeaponBase.h"
 #include "APlayerCharacter.generated.h"
 
-
 class UInputMappingContext;
 class UInputAction;
 
@@ -20,8 +19,6 @@ class SUBMECHANOPHOBIA_API AAPlayerCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AAPlayerCharacter();
-
-	AUWeaponBase* GetCurrentWeapon(); 
 
 protected:
 	// Called when the game starts or when spawned
@@ -36,9 +33,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddWeapon( AUWeaponBase* weapon);
 
-	
+
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite,Replicated); 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite); 
 	//UPROPERTY(EditAnywhere)
 	class UCameraComponent* Camera;
 	
@@ -74,16 +71,16 @@ protected:
 	FTimerHandle UnusedHandle;
 
 	// Weapons
-	UPROPERTY(EditAnywhere, BlueprintReadOnly,	Replicated,  Category = "gameplay");
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "gameplay");
 	AUWeaponBase* currentWeapon;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated, Category = "gameplay");
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "gameplay");
 	AUWeaponBase* PrimaryWeapon;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly,Replicated, Category = "gameplay");
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "gameplay");
 	AUWeaponBase* SecondaryWeapon; 
 
-	
+	FHitResult* HitResult;
 
 	bool canShoot = true; 
 	
@@ -92,64 +89,15 @@ protected:
 	void StopJump();
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-
-	
 	
 	void FireWeapon();
-	
 	void SwapWeaponPrimary();
-	void EquipPrimary();
-	
 	void SwapWeaponSecondary();
-	void EquipSecondary();
-	
-	void ReloadBinding();
-
 	void Reload(); 
-	
 	void WeaponFireDelay(); 
 
-	
 	void RayCast();
-
-
 	
-	UFUNCTION(Server,Reliable)
-	void RPC_EquipPrimary();
 	
-	UFUNCTION(Server,Reliable)
-	void RPC_EquipSecondary();
-
-	UFUNCTION(NetMulticast,Reliable)
-	void NetMulticast_EquipSecondary();
 	
-	UFUNCTION(NetMulticast,Reliable)
-	void NetMulticast_EquipPrimary();
-
-
-
-
-
-	UFUNCTION(Server,Reliable)
-	void RPC_FireWeapon(); 
-
-	UFUNCTION(NetMulticast,Reliable)
-	void Muticast_FireWeapon();
-
-
-
-
-
-	UFUNCTION(Server,Reliable)
-	void RPC_Reload(); 
-
-	UFUNCTION(NetMulticast,Reliable)
-	void Muticast_Reload();
-
-	
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };
-
-
-
-

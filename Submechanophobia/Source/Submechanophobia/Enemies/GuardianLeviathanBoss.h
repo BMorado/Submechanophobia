@@ -1,9 +1,12 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Enemy.h"
 #include "HealthComponent.h"
 #include "Animation/AnimInstance.h"
+#include "Net/UnrealNetwork.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GuardianLeviathanBoss.generated.h"
@@ -38,48 +41,21 @@ public:
     //UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss Stats")
     //float Health = 100.0f;
 
-    UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_CurrentStage, BlueprintReadWrite, Category = "Boss Stats")
+    UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Boss Stats")
     int CurrentStage = 1;
-
-    UFUNCTION()
-    void OnRep_CurrentStage();
 
     UFUNCTION(BlueprintCallable)
     void EnterNextStage();
 
     static float SharedHealth;
     static float MaxSharedHealth;
+    static AGuardianLeviathanBoss* PrimaryBoss; // Used to run stage transitions only
 
-    UPROPERTY(ReplicatedUsing = OnRep_SharedHealth)
-    float ReplicatedSharedHealth = 100.f;
-
-    // RepNotify function to update locally when replicated
-    UFUNCTION()
-    void OnRep_SharedHealth();
-
-    UFUNCTION(BlueprintCallable)
-    static float GetSharedHealth();
-
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
-    AGuardianLeviathanBoss* PrimaryBoss = nullptr;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated)
+    UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Boss")
     bool bIsPrimaryBoss = false;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Replicated)
-    bool bHasPrimaryBeenAssigned = false;
-
-    void OnBossDamaged(float);
-
-    virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
-
-    UFUNCTION(BlueprintCallable)
-    void ApplySharedDamage(float Amount);
-
-
     // --- Anim Montages ---
-    UPROPERTY(EditAnywhere, Replicated, BlueprintReadOnly, Category = "Boss|Animation")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss|Animation")
     UAnimMontage* FireMontage;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss|Animation")
@@ -88,12 +64,12 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss|Animation")
     UAnimMontage* LungeMontage;
 
-    UPROPERTY(EditAnywhere, Replicated, BlueprintReadOnly, Category = "Boss|Animation")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss|Animation")
     UAnimMontage* TransitionMontage;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Boss|Hitboxes")
     UCapsuleComponent* FireDamageHitbox;
-
+  
     // --- Animation Events ---
     FOnMontageEnded MontageEndDelegate;
 
@@ -129,7 +105,16 @@ public:
     UFUNCTION(BlueprintCallable)
     void MoveToNewHole();
 
-    
+    void OnBossDamaged(float CurrentHealth);
+
+    virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,class AController* EventInstigator, AActor* DamageCauser) override;
+
+    UFUNCTION(BlueprintCallable)
+    void ApplySharedDamage(float Amount);
+
+    UFUNCTION(BlueprintCallable)
+    static float GetSharedHealth();
+
     // --- Screech Sound ---
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Audio")
     USoundBase* ScreechSound;
@@ -152,32 +137,28 @@ public:
     UPROPERTY()
     UNiagaraComponent* FlameEffect2;
 
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|UI")
     TSubclassOf<class UUserWidget> WinWidgetClass;
 
-    //REPLICATION STUFF ADDED
-
-    virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
-
-    UFUNCTION(Server, Reliable)
-    void Server_FireAttack();
-
-    UFUNCTION(NetMulticast, Reliable)
-    void Multicast_PlayFireAttack();
-
-    UFUNCTION(NetMulticast, Reliable)
-    void Multicast_PlayTransitionIn();
+    void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
    
-    UFUNCTION(NetMulticast, Reliable)
-    void Multicast_PlayTransitionOut();
+    UPROPERTY(ReplicatedUsing = OnRep_SharedHealth)
+    float ReplicatedSharedHealth;
 
-    UFUNCTION(NetMulticast, Reliable)
-    void Multicast_OnBossDefeated();
-
-    /*UFUNCTION(NetMulticast, Reliable)
-    void Multicast_SpawnSerpent(SpawnHole.Location, SpawnHole.Rotation, 2, SpawnIndex);*/
-   
-
+    UFUNCTION()
+    void OnRep_SharedHealth();
     
+    /*UPROPERTY(ReplicatedUsing = OnRep_PlayFireVFX)
+    bool bShouldPlayFireVFX = false;
+
+    UFUNCTION()
+    void OnRep_PlayFireVFX();
+
+    UPROPERTY(ReplicatedUsing = OnRep_StopFireVFX)
+    bool bShouldStopFireVFX = false;
+
+    UFUNCTION()
+    void OnRep_StopFireVFX();*/
 
 };

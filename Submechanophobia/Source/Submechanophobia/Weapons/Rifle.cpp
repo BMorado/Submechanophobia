@@ -15,7 +15,7 @@ ARifle::ARifle()
 	
 	bulletSpread = FVector(FMath::RandRange(-50.0f, 50.0f),FMath::RandRange(-50.0f, 50.0f),FMath::RandRange(-50.0f, 50.0f));
 	
-	damage = 25.0f;
+	damage = 8.0f;
 	
 	magazineCapacity = 25; 
 	

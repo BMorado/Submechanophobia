@@ -10,7 +10,6 @@
 #include "Components/InputComponent.h"
 #include "Submechanophobia/Enemies/Enemy.h"
 #include "Submechanophobia/Weapons/WeaponBase.h"
-#include "Net/UnrealNetwork.h"
  
 
 
@@ -22,12 +21,15 @@ AAPlayerCharacter::AAPlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Player Camera"));
-	Camera->SetupAttachment(GetCapsuleComponent());
+	Camera->SetupAttachment(GetMesh(), TEXT("HeadCameraSocket")); // or TEXT("head")
 	Camera->bUsePawnControlRotation = true;
+
+	Camera->SetRelativeLocation(FVector::ZeroVector);
+	Camera->SetRelativeRotation(FRotator::ZeroRotator);
+	
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationPitch = true;
 	bUseControllerRotationRoll = false;
-	bReplicates = true;
 
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f,500.0f,0.0f);
@@ -40,9 +42,7 @@ AAPlayerCharacter::AAPlayerCharacter()
 	{
 		MeleeAttackMontage = MeleeAttackMontageObject.Object;
 	}
-	
-
-
+	HitResult = new FHitResult(0); 
 }
 
 // Called when the game starts or when spawned
@@ -79,14 +79,11 @@ void AAPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Look);
 		EnhancedInput->BindAction(SwapToPrimaryAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::SwapWeaponPrimary);
 		EnhancedInput->BindAction(SwapToSecondaryAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::SwapWeaponSecondary);
-		EnhancedInput->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::ReloadBinding);
+		EnhancedInput->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &AAPlayerCharacter::Reload);
 	}
 }
 
-AUWeaponBase* AAPlayerCharacter::GetCurrentWeapon()
-{
-	return currentWeapon; 
-}
+
 
 
 void AAPlayerCharacter::StartJump()
@@ -127,48 +124,23 @@ void AAPlayerCharacter::Look(const FInputActionValue& Value)
 
 void AAPlayerCharacter::FireWeapon()
 {
-	
-	// if (currentWeapon != nullptr && currentWeapon->magazineAmmo > 0 && canShoot)
-	// {
-	// 	if (HasAuthority()){Muticast_FireWeapon();}
-	// 	else{RPC_FireWeapon();}
-	// }
-
-	if (HasAuthority()){Muticast_FireWeapon();}
-	 	else{RPC_FireWeapon();}
+	if (currentWeapon != nullptr && currentWeapon->magazineAmmo > 0 && canShoot)
+	{
+		RayCast(); 
+		currentWeapon->magazineAmmo--;
+		UGameplayStatics::ApplyDamage(HitResult->GetActor(),currentWeapon->damage,nullptr,this,nullptr);
+		GetWorld()->GetTimerManager().SetTimer(UnusedHandle,this,&AAPlayerCharacter::WeaponFireDelay,currentWeapon->fireRate,false); 
+	}
 	
 }
-
- void AAPlayerCharacter::RPC_FireWeapon_Implementation()
-{
-	Muticast_FireWeapon(); 
-}
-
-
-void AAPlayerCharacter::Muticast_FireWeapon_Implementation()
-{
-
-	RayCast();
-}
-
 
 
 void AAPlayerCharacter::WeaponFireDelay()
 {
 	canShoot = true ; 
 }
-
-
-
 //hides secondary weapon, makes primary weapon visible then sets primary to current weapon
 void AAPlayerCharacter::SwapWeaponPrimary()
-{
-	
-		RPC_EquipPrimary(); 
-	
-}
-
-void AAPlayerCharacter::EquipPrimary()
 {
 	if (PrimaryWeapon && currentWeapon != PrimaryWeapon)
 	{
@@ -178,18 +150,12 @@ void AAPlayerCharacter::EquipPrimary()
 		PrimaryWeapon->weaponMesh->SetVisibility(true);
 		currentWeapon =  PrimaryWeapon;
 	}
+	
+	
 }
 
 //hides primary weapon, makes secondary weapon visible then sets secondary to current weapon
 void AAPlayerCharacter::SwapWeaponSecondary()
-{
-	if (SecondaryWeapon && currentWeapon != SecondaryWeapon)
-	{
-		RPC_EquipSecondary(); 
-	}
-}
-
-void AAPlayerCharacter::EquipSecondary()
 {
 	if (SecondaryWeapon && currentWeapon != SecondaryWeapon)
 	{
@@ -199,6 +165,7 @@ void AAPlayerCharacter::EquipSecondary()
 		SecondaryWeapon->weaponMesh->SetVisibility(true);
 		currentWeapon =  SecondaryWeapon;
 	}
+	
 }
 
 void AAPlayerCharacter::Reload()
@@ -206,6 +173,7 @@ void AAPlayerCharacter::Reload()
 	// Check if pointer isn't null and that we have a weapon
 	if (currentWeapon)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Current Mag  Pre-Reload: %u"),currentWeapon->magazineAmmo);
 		
 		// See if the number of "bullets" is below capacity
 		if (currentWeapon->magazineAmmo < currentWeapon->magazineCapacity && currentWeapon->reserveAmmo != 0)
@@ -217,6 +185,7 @@ void AAPlayerCharacter::Reload()
 			currentWeapon->reserveAmmo -= ReloadCalculation;
 		}
 	}
+	UE_LOG(LogTemp, Warning, TEXT("Current Mag  Post-Reload: %u"),currentWeapon->magazineAmmo);
 
 }
 	
@@ -225,90 +194,32 @@ void AAPlayerCharacter::Reload()
 
 void  AAPlayerCharacter::RayCast()
 {
-	if (currentWeapon != nullptr && currentWeapon->magazineAmmo > 0 && canShoot){
-		canShoot = false;
+	canShoot = false;
 	
-		FVector StartTrace = Camera->GetComponentLocation();
-		FVector ForwardVector = Camera->GetForwardVector();
-		FVector offset = FMath::VRand() * 2.0f;
-		FHitResult HitResult;
-		FVector EndTrace = (currentWeapon->bulletSpread + ForwardVector * 5000.f) + StartTrace;
+	FVector StartTrace = Camera->GetComponentLocation();
+	FVector ForwardVector = Camera->GetForwardVector();
+	FVector offset = FMath::VRand() * 2.0f;
+	 
+	FVector EndTrace = (currentWeapon->bulletSpread + ForwardVector * 5000.f) + StartTrace;
 	
-		FCollisionQueryParams* CQP = new FCollisionQueryParams();
-		CQP->bIgnoreBlocks = false;
-		if (GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Camera, *CQP))
-		{
-			//PlayAnimMontage(MeleeAttackMontage);
-			DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 255), true);
-
+	FCollisionQueryParams* CQP = new FCollisionQueryParams();
+	CQP->bIgnoreBlocks = false;
+	if (GetWorld()->LineTraceSingleByChannel(*HitResult, StartTrace, EndTrace, ECC_Camera, *CQP))
+	{
+		//PlayAnimMontage(MeleeAttackMontage);
+		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 255), true);
 		
-			currentWeapon->magazineAmmo--;
-			UGameplayStatics::ApplyDamage(HitResult.GetActor(),currentWeapon->damage,nullptr,this,nullptr);
-			GetWorld()->GetTimerManager().SetTimer(UnusedHandle,this,&AAPlayerCharacter::WeaponFireDelay,currentWeapon->fireRate,false);
-		}	
 	}
 	
 }
 
 
-void AAPlayerCharacter::RPC_EquipPrimary_Implementation()
-{
-	NetMulticast_EquipPrimary();
-
-}
-
-
-
-void AAPlayerCharacter::RPC_EquipSecondary_Implementation()
-{
-	 NetMulticast_EquipSecondary(); 
-}
-
-void AAPlayerCharacter::NetMulticast_EquipSecondary_Implementation()
-{
-	EquipSecondary();
-}
-
-void AAPlayerCharacter::NetMulticast_EquipPrimary_Implementation()
-{
-	EquipPrimary();
-
-}
-
-void AAPlayerCharacter::RPC_Reload_Implementation()
-{
-	Muticast_Reload();
-}
-
-
-void AAPlayerCharacter::Muticast_Reload_Implementation()
-{
-	Reload();
-}
-
-void AAPlayerCharacter::ReloadBinding()
-{
-	if (HasAuthority()){Muticast_Reload();}
-	else{RPC_Reload();}
-}
-
-
-
-
-void AAPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AAPlayerCharacter, currentWeapon); // or whatever your variable is
-	DOREPLIFETIME(AAPlayerCharacter, PrimaryWeapon); // or whatever your variable is
-	DOREPLIFETIME(AAPlayerCharacter, SecondaryWeapon); // or whatever your variable is
-
-	DOREPLIFETIME(AAPlayerCharacter, Camera); // or whatever your variable is
-
-}
-
 
 void AAPlayerCharacter::AddWeapon( AUWeaponBase* weapon)
 {
+	
+	
+	
 	FAttachmentTransformRules AttachRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true);
 	//checks if the weapon being added is a Primary weapon
 	if (weapon->isPrimary)
@@ -347,4 +258,9 @@ void AAPlayerCharacter::AddWeapon( AUWeaponBase* weapon)
 
 		
 	}
-}	//attach weapon actor to player mesh so
+
+	//attach weapon actor to player mesh socket 
+}
+
+
+
