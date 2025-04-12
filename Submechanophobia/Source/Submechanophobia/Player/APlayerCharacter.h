@@ -20,7 +20,7 @@ class SUBMECHANOPHOBIA_API AAPlayerCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AAPlayerCharacter();
-	bool hasFired = false;
+
 	AUWeaponBase* GetCurrentWeapon(); 
 
 protected:

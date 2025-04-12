@@ -26,10 +26,5 @@ void UAnim_Player::NativeUpdateAnimation(float DeltaTime)
 		bAccelerating = PlayerCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.0f;
 
 		bIsInAir = PlayerCharacter->GetCharacterMovement()->IsFalling();
-		if (PlayerCharacter->GetCurrentWeapon())
-		{
-			bHasPistol = !PlayerCharacter->GetCurrentWeapon()->isPrimary;
-		}
-		bHasFired = PlayerCharacter->hasFired;
 	}
 }
