@@ -65,6 +65,7 @@ void AAPlayerCharacter::BeginPlay()
 void AAPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	//hasFired = false;
 
 }
 
@@ -146,7 +147,7 @@ void AAPlayerCharacter::FireWeapon()
 	// 	if (HasAuthority()){Muticast_FireWeapon();}
 	// 	else{RPC_FireWeapon();}
 	// }
-
+	hasFired = true;
 	if (HasAuthority()){Muticast_FireWeapon(GetControlRotation());}
 	 	else{RPC_FireWeapon(GetControlRotation());}
 	
