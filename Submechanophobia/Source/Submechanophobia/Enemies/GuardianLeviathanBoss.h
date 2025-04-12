@@ -82,17 +82,14 @@ public:
     UPROPERTY(EditAnywhere, Replicated, BlueprintReadOnly, Category = "Boss|Animation")
     UAnimMontage* FireMontage;
 
-    UPROPERTY(EditAnywhere, Replicated, BlueprintReadOnly, Category = "Boss|Animation")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss|Animation")
     UAnimMontage* ScreechMontage;
 
-    UPROPERTY(EditAnywhere, Replicated, BlueprintReadOnly, Category = "Boss|Animation")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss|Animation")
     UAnimMontage* LungeMontage;
 
     UPROPERTY(EditAnywhere, Replicated, BlueprintReadOnly, Category = "Boss|Animation")
     UAnimMontage* TransitionMontage;
-
-    UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Animation")
-    UAnimMontage* DeathMontage;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Boss|Hitboxes")
     UCapsuleComponent* FireDamageHitbox;
@@ -177,15 +174,10 @@ public:
     UFUNCTION(NetMulticast, Reliable)
     void Multicast_OnBossDefeated();
 
-    UFUNCTION(NetMulticast, Reliable)
-    void Multicast_ScreechAttack();
+    /*UFUNCTION(NetMulticast, Reliable)
+    void Multicast_SpawnSerpent(SpawnHole.Location, SpawnHole.Rotation, 2, SpawnIndex);*/
    
-    UFUNCTION(Server, Reliable)
-    void Server_LungeAttack();
 
-    UFUNCTION(NetMulticast, Reliable)
-    void Multicast_PlayLungeAttack();
     
-    UFUNCTION(NetMulticast, Reliable)
-    void Multicast_PlayDeathAnimation();
+
 };

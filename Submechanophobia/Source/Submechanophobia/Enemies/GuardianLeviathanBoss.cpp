@@ -118,8 +118,6 @@ void AGuardianLeviathanBoss::GetLifetimeReplicatedProps(TArray< FLifetimePropert
     DOREPLIFETIME(AGuardianLeviathanBoss, CurrentStage);
     DOREPLIFETIME(AGuardianLeviathanBoss, bIsPrimaryBoss);
     DOREPLIFETIME(AGuardianLeviathanBoss, PrimaryBoss);
-    DOREPLIFETIME(AGuardianLeviathanBoss, LungeMontage);
-    DOREPLIFETIME(AGuardianLeviathanBoss, DeathMontage);
 
 }
 
@@ -337,26 +335,11 @@ void AGuardianLeviathanBoss::ApplySharedDamage(float Amount)
                     OccupiedHoleIndices.Remove(SerpentBoss->LastHoleIndex);
                 }
 
+                // Destroy the serpent
+                SerpentBoss->Destroy();
 
-
-                SerpentBoss->Multicast_PlayDeathAnimation();
-
-                // Delay the destroy to match montage length (~3 seconds)
-                FTimerHandle DeathTimerHandle;
-                SerpentBoss->GetWorldTimerManager().SetTimer(
-                    DeathTimerHandle,
-                    FTimerDelegate::CreateLambda([SerpentBoss]()
-                        {
-                            if (IsValid(SerpentBoss))
-                            {
-                                SerpentBoss->Destroy();
-                            }
-                        }),
-                    3.0f, // Change this to match your DeathMontage length
-                    false
-                );
-
-        
+                //PrimaryBoss = nullptr;
+                //bHasPrimaryBeenAssigned = false;
             }
         }
 
@@ -389,10 +372,7 @@ void AGuardianLeviathanBoss::FireAttack()
 void AGuardianLeviathanBoss::Server_FireAttack_Implementation()
 {
     // Core logic stays server-side
-    if (bIsPrimaryBoss)
-    {
-        ApplySharedDamage(10.f);
-    }
+    ApplySharedDamage(10.f);
     
     if (FireDamageHitbox)
     {
@@ -480,34 +460,28 @@ void AGuardianLeviathanBoss::ApplyScreechDamage()
 
 void AGuardianLeviathanBoss::ScreechAttack()
 {
-    if (!HasAuthority()) return;
-
-    // Play effects on all clients
-    Multicast_ScreechAttack();
-
-    // Do damage on server only
-    ApplyScreechDamage();
-}
-
-
-void AGuardianLeviathanBoss::Multicast_ScreechAttack_Implementation()
-{
-    if (!enemyMesh || !ScreechMontage) return;
+    if (!ScreechMontage) return;
 
     UAnimInstance* Anim = enemyMesh->GetAnimInstance();
     if (!Anim) return;
 
-    UE_LOG(LogTemp, Warning, TEXT("Multicast_ScreechAttack called on %s"), *GetName());
-
+    UE_LOG(LogTemp, Log, TEXT("Boss performing Screech"));
+    Anim->Montage_SetEndDelegate(MontageEndDelegate, ScreechMontage);
     Anim->Montage_Play(ScreechMontage);
 
-    // Optional: Play sound
+    // Damage only — stun logic omitted per now
+    TArray<AActor*> Players;
+    GetOverlappingActors(Players, AAPlayerCharacter::StaticClass());
+
+    // Play sound
     if (ScreechSound)
     {
         UGameplayStatics::PlaySoundAtLocation(this, ScreechSound, GetActorLocation());
     }
-}
 
+    // Apply AOE Damage
+    ApplyScreechDamage();
+}
 
 void AGuardianLeviathanBoss::ApplyLungeDamage()
 {
@@ -531,14 +505,11 @@ void AGuardianLeviathanBoss::ApplyLungeDamage()
     }
 }
 
-void AGuardianLeviathanBoss::Multicast_PlayLungeAttack_Implementation()
+void AGuardianLeviathanBoss::LungeAttack()
 {
-    UE_LOG(LogTemp, Warning, TEXT("Multicast_PlayLungeAttack called on %s. HasAuthority: %s, Role: %d"),
-        *GetName(),
-        HasAuthority() ? TEXT("true") : TEXT("false"),
-        (int32)GetLocalRole());
+    if (!LungeMontage) return;
 
-    if (!LungeMontage || !enemyMesh) return;
+    UE_LOG(LogTemp, Log, TEXT("Boss performing Lunge"));
 
     UAnimInstance* Anim = enemyMesh->GetAnimInstance();
     if (Anim)
@@ -547,7 +518,7 @@ void AGuardianLeviathanBoss::Multicast_PlayLungeAttack_Implementation()
         Anim->Montage_SetEndDelegate(MontageEndDelegate, LungeMontage);
     }
 
-    // Face and lunge toward closest player
+    // Face the nearest player
     AActor* ClosestPlayer = nullptr;
     float ClosestDistance = FLT_MAX;
 
@@ -568,66 +539,16 @@ void AGuardianLeviathanBoss::Multicast_PlayLungeAttack_Implementation()
     {
         FVector Direction = (ClosestPlayer->GetActorLocation() - GetActorLocation()).GetSafeNormal();
         FRotator NewRot = Direction.Rotation();
-        SetActorRotation(NewRot); // Face target
+        SetActorRotation(NewRot); // Face player
 
-        FVector LungeDestination = GetActorLocation() + Direction * 500.f;
-        SetActorLocation(LungeDestination, true);
+        // Move forward a bit in that direction (basic lunge)
+        FVector LungeDestination = GetActorLocation() + Direction * 500.f; // Adjust strength as needed
+        SetActorLocation(LungeDestination, true); // 'true' = sweep to avoid going through walls
     }
 
-    // Delay damage slightly after the lunge movement
+    // Do damage after lunging
     GetWorldTimerManager().SetTimerForNextTick(this, &AGuardianLeviathanBoss::ApplyLungeDamage);
 }
-
-void AGuardianLeviathanBoss::Server_LungeAttack_Implementation()
-{
-    // Face and lunge toward the closest player
-    AActor* ClosestPlayer = nullptr;
-    float ClosestDistance = FLT_MAX;
-
-    TArray<AActor*> FoundPlayers;
-    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAPlayerCharacter::StaticClass(), FoundPlayers);
-
-    for (AActor* Player : FoundPlayers)
-    {
-        float Dist = FVector::Dist(Player->GetActorLocation(), GetActorLocation());
-        if (Dist < ClosestDistance)
-        {
-            ClosestPlayer = Player;
-            ClosestDistance = Dist;
-        }
-    }
-
-    if (ClosestPlayer)
-    {
-        FVector Direction = (ClosestPlayer->GetActorLocation() - GetActorLocation()).GetSafeNormal();
-        FRotator NewRot = Direction.Rotation();
-        SetActorRotation(NewRot);
-
-        FVector LungeDestination = GetActorLocation() + Direction * 500.f;
-        SetActorLocation(LungeDestination, true);
-    }
-
-    // Snapback damage timer
-    GetWorldTimerManager().SetTimerForNextTick(this, &AGuardianLeviathanBoss::ApplyLungeDamage);
-
-    Multicast_PlayLungeAttack();
-}
-
-
-void AGuardianLeviathanBoss::LungeAttack()
-{
-    if (HasAuthority())
-    {
-        Server_LungeAttack();  // Call directly if we're the server
-    }
-    else
-    {
-        Server_LungeAttack();  // Clients request server to perform lunge
-    }
-}
-
-
-
 
 void AGuardianLeviathanBoss::TransitionOut()
 {
@@ -794,17 +715,4 @@ void AGuardianLeviathanBoss::Multicast_OnBossDefeated_Implementation()
     }
 }
 
-void AGuardianLeviathanBoss::Multicast_PlayDeathAnimation_Implementation()
-{
-    UE_LOG(LogTemp, Warning, TEXT("Multicast_PlayDeathAnimation called on %s. HasAuthority: %s"),
-        *GetName(),
-        HasAuthority() ? TEXT("true") : TEXT("false"));
 
-    USkeletalMeshComponent* Mesh = FindComponentByClass<USkeletalMeshComponent>();
-    if (!Mesh || !DeathMontage) return;
-
-    UAnimInstance* Anim = Mesh->GetAnimInstance();
-    if (!Anim) return;
-
-    Anim->Montage_Play(DeathMontage);
-}
