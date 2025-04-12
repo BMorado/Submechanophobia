@@ -39,7 +39,7 @@ ADrownedCrew::ADrownedCrew()
 	{
 		enemyMesh->SetAnimInstanceClass(AnimBlueprint.Class);
 	}
-	UClass* AIContollerClass = LoadClass<AAIController>(nullptr, TEXT("/Game/AI/DrownedCrewAI/BP_DrownedCrewAIController.BP_DrownedCrewAIController_C"));
+	/*UClass* AIContollerClass = LoadClass<AAIController>(nullptr, TEXT("/Game/AI/DrownedCrewAI/BP_DrownedCrewAIController.BP_DrownedCrewAIController_C"));
 	
 	if (AIContollerClass != nullptr)
 	{
@@ -47,6 +47,7 @@ ADrownedCrew::ADrownedCrew()
 		AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 		bUseControllerRotationYaw = true;
 	}
+	*/
 
 	attackMontage = LoadObject<UAnimMontage>(nullptr, TEXT("/Game/Boss_assets/crewmate1/Zombie_Attack_03_Montage.Zombie_Attack_03_Montage"));
 	damagedMontage =  LoadObject<UAnimMontage>(nullptr, TEXT("/Game/Boss_assets/crewmate1/Zombie_Damage_Montage.Zombie_Damage_Montage"));

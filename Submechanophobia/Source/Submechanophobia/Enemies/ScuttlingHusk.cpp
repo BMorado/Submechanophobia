@@ -45,14 +45,14 @@ AScuttlingHusk::AScuttlingHusk()
 	}
 
 	// Load AI Controller class 
-	UClass* AIContollerClass = LoadClass<AAIController>(nullptr, TEXT("/Game/AI/ScuttlingHuskAI/AIC_ScuttlingHusk.AIC_ScuttlingHusk_C"));
+	/*UClass* AIContollerClass = LoadClass<AAIController>(nullptr, TEXT("/Game/AI/ScuttlingHuskAI/AIC_ScuttlingHusk.AIC_ScuttlingHusk_C"));
 	
 	if (AIContollerClass != nullptr)
 	{
 		AIControllerClass = AIContollerClass;
 		AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 		bUseControllerRotationYaw = true;
-	}
+	}*/
 	// Load Animations
 	attackMontage = LoadObject<UAnimMontage>(nullptr, TEXT("/Game/Boss_assets/Scuttling_Husk/ScuttlingHusk_Attack_Montage.ScuttlingHusk_Attack_Montage"));
 	damagedMontage =  LoadObject<UAnimMontage>(nullptr, TEXT("/Game/Boss_assets/Scuttling_Husk/crab_damaged_Montage.crab_damaged_Montage"));
