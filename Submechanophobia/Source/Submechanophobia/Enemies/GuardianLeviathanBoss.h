@@ -82,14 +82,17 @@ public:
     UPROPERTY(EditAnywhere, Replicated, BlueprintReadOnly, Category = "Boss|Animation")
     UAnimMontage* FireMontage;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss|Animation")
+    UPROPERTY(EditAnywhere, Replicated, BlueprintReadOnly, Category = "Boss|Animation")
     UAnimMontage* ScreechMontage;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss|Animation")
+    UPROPERTY(EditAnywhere, Replicated, BlueprintReadOnly, Category = "Boss|Animation")
     UAnimMontage* LungeMontage;
 
     UPROPERTY(EditAnywhere, Replicated, BlueprintReadOnly, Category = "Boss|Animation")
     UAnimMontage* TransitionMontage;
+
+    UPROPERTY(EditAnywhere, Replicated, BlueprintReadWrite, Category = "Animation")
+    UAnimMontage* DeathMontage;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Boss|Hitboxes")
     UCapsuleComponent* FireDamageHitbox;
@@ -134,6 +137,12 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Audio")
     USoundBase* ScreechSound;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Audio")
+    USoundBase* SpawnSerpentSound;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Boss|Audio")
+    USoundBase* DeathSound;
+
     // Static tracking of occupied holes (shared across all serpents)
     static TArray<int32> OccupiedHoleIndices;
 
@@ -174,10 +183,26 @@ public:
     UFUNCTION(NetMulticast, Reliable)
     void Multicast_OnBossDefeated();
 
-    /*UFUNCTION(NetMulticast, Reliable)
-    void Multicast_SpawnSerpent(SpawnHole.Location, SpawnHole.Rotation, 2, SpawnIndex);*/
-   
+    UFUNCTION(Server, Reliable)
+    void Server_ScreechAttack();
 
+    UFUNCTION(NetMulticast, Reliable)
+    void Multicast_PlayScreech();
+   
+    UFUNCTION(Server, Reliable)
+    void Server_LungeAttack();
+
+    UFUNCTION(NetMulticast, Reliable)
+    void Multicast_PlayLungeAttack();
     
+    UFUNCTION(NetMulticast, Reliable)
+    void Multicast_PlayDeathAnimation();
+
+    UFUNCTION(Server, Reliable, WithValidation)
+    void Server_ApplySharedDamage(float Amount);
+
+    UFUNCTION(NetMulticast, Reliable)
+    void Multicast_PlayDeathSound();
+
 
 };
