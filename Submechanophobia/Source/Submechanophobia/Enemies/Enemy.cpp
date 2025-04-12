@@ -15,7 +15,8 @@ AEnemy::AEnemy()
 	
 	// Setup for Capsule collider 
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
-
+	SetReplicates(true);
+	bReplicates = true;
 	CapsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
 	CapsuleComponent->SetCollisionResponseToChannel(ECC_Camera,ECR_Block);
 	CapsuleComponent->SetCanEverAffectNavigation(false);

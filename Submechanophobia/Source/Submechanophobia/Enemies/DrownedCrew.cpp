@@ -90,7 +90,7 @@ void ADrownedCrew::PlayAttackAnim()
 	}
 }
 
-float ADrownedCrew::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+/*float ADrownedCrew::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
 	class AController* EventInstigator, AActor* DamageCauser)
 {
 	HealthComponent->TakeDamage(DamageAmount);
@@ -111,7 +111,7 @@ float ADrownedCrew::TakeDamage(float DamageAmount, struct FDamageEvent const& Da
 		this->Destroy();
 	}
 	return DamageAmount;
-}
+}*/
 
 void ADrownedCrew::AttackEnd()
 {
